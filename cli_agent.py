@@ -29,7 +29,7 @@ def print_header():
     """Print the app header."""
     print()
     print(f"{Colors.CYAN}╔══════════════════════════════════════════════════════════════════╗{Colors.END}")
-    print(f"{Colors.CYAN}║{Colors.END}  {Colors.BOLD}SUPPORT TICKET FORM FILLER{Colors.END} {Colors.DIM}(with Verifier Primacy){Colors.END}            {Colors.CYAN}║{Colors.END}")
+    print(f"{Colors.CYAN}║{Colors.END}  {Colors.BOLD}🏥 INSURANCE CLAIM PROCESSOR{Colors.END} {Colors.DIM}(with Verifier Primacy){Colors.END}          {Colors.CYAN}║{Colors.END}")
     print(f"{Colors.CYAN}╚══════════════════════════════════════════════════════════════════╝{Colors.END}")
 
 
@@ -117,19 +117,22 @@ def print_results(results: dict):
 
 
 def main():
-    # Form schema
+    # Insurance Claim Form Schema
     form_schema = {
-        "category": {
-            "allowed": ["hardware", "software", "network", "security", "other"],
+        "claim_type": {
+            "allowed": ["auto", "home", "health", "life", "travel"],
         },
-        "severity": {
-            "allowed": ["low", "medium", "high", "critical"],
+        "incident": {
+            "allowed": ["collision", "theft", "vandalism", "weather", "fire", "medical"],
         },
-        "system": {
-            "allowed": ["laptop", "desktop", "server", "phone", "other"],
+        "fault": {
+            "allowed": ["claimant", "other_party", "shared", "undetermined"],
         },
-        "escalation": {
-            "allowed": ["none", "team_lead", "manager", "director"],
+        "injury": {
+            "allowed": ["none", "minor", "moderate", "severe"],
+        },
+        "police_report": {
+            "allowed": ["yes", "no"],
         },
     }
 
@@ -153,7 +156,7 @@ def main():
 
     print(f"{Colors.GREEN}Ready!{Colors.END}")
     print(f"\n{Colors.DIM}{'━' * 68}{Colors.END}")
-    print(f"Enter your support request (or {Colors.YELLOW}'quit'{Colors.END} to exit):")
+    print(f"Describe your insurance claim (or {Colors.YELLOW}'quit'{Colors.END} to exit):")
 
     while True:
         try:

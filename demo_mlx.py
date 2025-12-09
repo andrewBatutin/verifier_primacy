@@ -1,156 +1,189 @@
 #!/usr/bin/env python3
 """
-Demo: Business Rules Verification via Logits Masking
+Demo: Form Filling with Constrained Fields
 
-This demonstrates the core concept of "verifier primacy":
-- Instead of generating text and then validating it
-- We constrain the model's output BEFORE sampling
-- Invalid tokens get -inf logits and literally cannot be generated
+Scenario: User pastes text and wants LLM to extract data into a form.
+Some fields have dropdown-style constraints (allowed values only).
 
-Example: A restaurant that only serves Coca-Cola products
-- Allowed: "coca cola", "sprite", "fanta"
-- Blocked: "pepsi", "mountain dew", "7up"
-
-The model cannot output "pepsi" - it's not validation, it's prevention.
+The verifier ensures constrained fields can ONLY contain allowed values.
+No hallucination, no invalid data - guaranteed at generation time.
 """
 
 import mlx.core as mx
 from mlx_lm import load
 
-from verifier import (
-    AllowedValuesRule,
-    create_allowed_values_verifier,
-)
+from verifier import create_allowed_values_verifier
 
 
-def demo_drinks_verification():
+def demo_form_filling():
     """
-    Demo: Restaurant only serves specific drinks.
-
-    Shows how logits masking prevents invalid outputs.
+    Demo: IT Support Ticket Form with constrained fields.
     """
-    print("=" * 60)
-    print("VERIFIER PRIMACY DEMO")
-    print("Business Rule: Restaurant Drink Menu")
-    print("=" * 60)
+    print("=" * 70)
+    print("VERIFIER PRIMACY DEMO: Form Filling with Constraints")
+    print("=" * 70)
 
-    # Business rule: Only these drinks are allowed
-    allowed_drinks = ["coca cola", "sprite", "fanta", "water"]
-    blocked_drinks = ["pepsi", "mountain dew", "7up", "dr pepper"]
+    # The input text - a realistic messy email/ticket
+    input_text = """
+From: sarah.jones@company.com
+Subject: HELP!!! System crashed during client demo
 
-    print("\n✓ ALLOWED drinks:", ", ".join(allowed_drinks))
-    print("✗ BLOCKED drinks:", ", ".join(blocked_drinks))
+Hi Support Team,
+
+I'm freaking out here. Was in the middle of a super important demo with
+Acme Corp (potential $2M deal!) and my whole system just froze. Blue screen
+of death. I've tried rebooting 3 times but it keeps happening.
+
+I think it might be related to that Windows update IT pushed last night?
+Or maybe my RAM is failing? The laptop is making weird clicking sounds too.
+
+This is EXTREMELY URGENT - I have a follow-up call with the client in 2 hours
+and I absolutely cannot miss it. Please escalate to whoever can help fastest.
+
+I'm in the Chicago office, desk 4B-221. Phone: x4455
+Employee ID: SJ-98234
+Department: Enterprise Sales
+
+Desperately need help,
+Sarah
+
+P.S. - I also noticed Outlook has been running super slow all week,
+emails taking forever to load. Not sure if related.
+""".strip()
+
+    # Form schema with constrained fields - realistic business form
+    form_schema = {
+        "category": {
+            "type": "constrained",
+            "allowed": ["hardware", "software", "network", "security", "access", "other"],
+            "description": "Issue category"
+        },
+        "severity": {
+            "type": "constrained",
+            "allowed": ["low", "medium", "high", "critical"],
+            "description": "Business impact level"
+        },
+        "affected_system": {
+            "type": "constrained",
+            "allowed": ["laptop", "desktop", "server", "printer", "phone", "other"],
+            "description": "Primary affected system"
+        },
+        "escalation": {
+            "type": "constrained",
+            "allowed": ["none", "team_lead", "manager", "director", "vp"],
+            "description": "Escalation level needed"
+        },
+    }
+
+    print("\n📄 INPUT TEXT:")
+    print("-" * 70)
+    print(input_text)
+
+    print("\n📋 FORM SCHEMA:")
+    print("-" * 70)
+    for field, config in form_schema.items():
+        if config["type"] == "constrained":
+            print(f"  {field}: {config['allowed']}")
 
     # Load model
-    print("\nLoading model...")
+    print("\n⏳ Loading model...")
     model, tokenizer = load("mlx-community/Qwen3-4B-4bit")
     vocab_size = model.model.embed_tokens.weight.shape[0]
 
-    # Create verifier with business rule
-    verifier = create_allowed_values_verifier(
-        tokenizer=tokenizer,
-        allowed_values=allowed_drinks,
-        vocab_size=vocab_size,
-    )
+    print("\n" + "=" * 70)
+    print("FIELD-BY-FIELD EXTRACTION WITH VERIFICATION")
+    print("=" * 70)
 
-    print(f"\nVerifier initialized:")
-    print(f"  - Vocab size: {vocab_size:,}")
-    print(f"  - Allowed tokens: {len(verifier.rules[0].allowed_token_ids)}")
+    # Process each constrained field
+    for field_name, config in form_schema.items():
+        allowed_values = config["allowed"]
 
-    # Show which tokens are allowed
-    print("\n" + "-" * 60)
-    print("TOKEN ANALYSIS")
-    print("-" * 60)
+        print(f"\n{'─' * 70}")
+        print(f"📝 FIELD: {field_name}")
+        print(f"   Allowed values: {allowed_values}")
+        print(f"{'─' * 70}")
 
-    rule = verifier.rules[0]
+        # Create verifier for this field
+        # Include space-prefixed versions since tokenizers often have " word" tokens
+        expanded_values = allowed_values + [f" {v}" for v in allowed_values]
+        verifier = create_allowed_values_verifier(
+            tokenizer=tokenizer,
+            allowed_values=expanded_values,
+            vocab_size=vocab_size,
+        )
 
-    print("\nAllowed drink tokens:")
-    for drink in allowed_drinks:
-        tokens = tokenizer.encode(drink)
-        token_texts = [tokenizer.decode([t]) for t in tokens]
-        print(f"  '{drink}' → {tokens} → {token_texts}")
+        # Construct prompt for extraction
+        prompt = f"""Extract the {field_name} from this text.
+Text: {input_text}
 
-    print("\nBlocked drink tokens:")
-    for drink in blocked_drinks:
-        tokens = tokenizer.encode(drink)
-        token_texts = [tokenizer.decode([t]) for t in tokens]
-        blocked = [t for t in tokens if t not in rule.allowed_token_ids]
-        print(f"  '{drink}' → blocked tokens: {blocked}")
+The {field_name} must be one of: {', '.join(allowed_values)}
+{field_name}:"""
 
-    # Demo: Check specific tokens
-    print("\n" + "-" * 60)
-    print("LOGIT MASKING DEMO")
-    print("-" * 60)
+        prompt_tokens = mx.array(tokenizer.encode(prompt))
 
-    # Create dummy logits (all zeros)
-    dummy_logits = mx.zeros(vocab_size)
+        # Get model's logits
+        logits = model(prompt_tokens[None, :])[:, -1, :].squeeze(0)
 
-    # Apply verifier
-    masked_logits = verifier.apply(dummy_logits, verifier.create_initial_state())
+        # 1. Show UNCONSTRAINED top predictions
+        print(f"\n   🔓 WITHOUT constraint (model's raw preferences):")
+        top_unconstrained = mx.argsort(logits)[-8:][::-1].tolist()
+        for i, tid in enumerate(top_unconstrained[:5]):
+            txt = tokenizer.decode([tid]).strip()
+            print(f"      #{i+1}: '{txt}' (logit={logits[tid].item():.1f})")
 
-    # Check what happens to specific tokens
-    test_words = ["coca", "cola", "pepsi", "sprite", "mountain"]
-    print("\nToken logits after masking:")
-    for word in test_words:
-        token_id = tokenizer.encode(word)[0]
-        original = dummy_logits[token_id].item()
-        masked = masked_logits[token_id].item()
-        status = "ALLOWED ✓" if masked > -1e8 else "BLOCKED ✗"
-        print(f"  '{word}' (id={token_id}): {original:.0f} → {masked:.0f} [{status}]")
+        # 2. Apply verifier
+        constrained_logits = verifier.apply(logits, verifier.create_initial_state())
 
-    # Demo: Compare constrained vs unconstrained
-    print("\n" + "-" * 60)
-    print("GENERATION COMPARISON")
-    print("-" * 60)
+        # 3. Show CONSTRAINED top predictions
+        print(f"\n   🔒 WITH constraint (only allowed values):")
+        top_constrained = mx.argsort(constrained_logits)[-5:][::-1].tolist()
+        for i, tid in enumerate(top_constrained):
+            txt = tokenizer.decode([tid]).strip()
+            logit_val = constrained_logits[tid].item()
+            if logit_val > -1e8:
+                print(f"      #{i+1}: '{txt}' (logit={logit_val:.1f}) ✓")
 
-    prompt = "What soft drink would you recommend? I suggest"
-    prompt_tokens = mx.array(tokenizer.encode(prompt))
+        # 4. Show what gets BLOCKED - real tokens from model's top choices
+        print(f"\n   🚫 BLOCKED (high-probability tokens that are not allowed):")
+        # Get top 30 from unconstrained to find blocked ones
+        top30 = mx.argsort(logits)[-30:][::-1].tolist()
+        blocked_count = 0
+        for tid in top30:
+            if blocked_count >= 5:
+                break
+            masked = constrained_logits[tid].item()
+            if masked < -1e8:  # This token was blocked
+                txt = tokenizer.decode([tid]).replace('\n', '\\n')
+                # Skip pure whitespace/newline tokens for cleaner output
+                if txt.strip() == '' or txt == '\\n' or txt == '\\n\\n':
+                    continue
+                orig = logits[tid].item()
+                print(f"      '{txt.strip()}' (logit={orig:.1f}) → -inf BLOCKED")
+                blocked_count += 1
 
-    print(f"\nPrompt: '{prompt}'")
+        # 5. Final selection
+        selected_token = mx.argmax(constrained_logits).item()
+        selected_text = tokenizer.decode([selected_token]).strip()
+        print(f"\n   ✅ SELECTED: {selected_text}")
 
-    # 1. UNCONSTRAINED generation
-    print("\n1. WITHOUT verification (model free to generate anything):")
-    logits = model(prompt_tokens[None, :])[:, -1, :].squeeze(0)
-    top5 = mx.argsort(logits)[-5:][::-1].tolist()
-    for i, tid in enumerate(top5):
-        txt = tokenizer.decode([tid])
-        print(f"   #{i+1}: '{txt}' (logit={logits[tid].item():.1f})")
-
-    # 2. CONSTRAINED generation
-    print("\n2. WITH verification (only allowed drinks):")
-    constrained = verifier.apply(logits, verifier.create_initial_state())
-    top5 = mx.argsort(constrained)[-5:][::-1].tolist()
-    for i, tid in enumerate(top5):
-        txt = tokenizer.decode([tid])
-        is_allowed = tid in rule.allowed_token_ids
-        print(f"   #{i+1}: '{txt}' (logit={constrained[tid].item():.1f}) {'✓' if is_allowed else ''}")
-
-    # 3. Show that pepsi is impossible
-    print("\n3. PROOF: 'pepsi' tokens are impossible to generate:")
-    pepsi_tokens = tokenizer.encode("pepsi")
-    for tid in pepsi_tokens:
-        txt = tokenizer.decode([tid])
-        original = logits[tid].item()
-        masked = constrained[tid].item()
-        print(f"   Token '{txt}' (id={tid}): {original:.1f} → {masked:.0f} (BLOCKED)")
-
-    # Final summary
-    print("\n" + "=" * 60)
+    # Summary
+    print("\n" + "=" * 70)
     print("KEY INSIGHT")
-    print("=" * 60)
+    print("=" * 70)
     print("""
-The model CANNOT generate "pepsi" or other blocked drinks.
-It's not validation after generation - it's prevention at the source.
+The model extracts information from text, but constrained fields can
+ONLY contain values from the allowed list.
 
-How it works:
-1. Model produces logits (probability distribution over all tokens)
-2. Verifier masks blocked tokens to -infinity
-3. Softmax(-inf) = 0, so blocked tokens have zero probability
-4. Sampling can only select from allowed tokens
+For 'priority': Even if model wants to output "urgent" (from the text),
+it's blocked. Only "low", "medium", "high", "critical" are possible.
 
-This is "verifier primacy" - verify don't pray.
+This is VERIFICATION AT GENERATION TIME:
+- Not: Generate → Validate → Retry if invalid
+- But: Constrain → Generate valid output guaranteed
+
+The invalid tokens get -inf logits, making them impossible to sample.
 """)
 
 
 if __name__ == "__main__":
-    demo_drinks_verification()
+    demo_form_filling()

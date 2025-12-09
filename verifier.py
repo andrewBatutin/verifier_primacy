@@ -443,3 +443,64 @@ def create_json_verifier(
         rules.append(SchemaRule(schema))
 
     return LogitsVerifier(tokenizer, rules=rules, vocab_size=vocab_size)
+
+
+class AllowedValuesRule(VerificationRule):
+    """
+    Simple rule that only allows tokens from a predefined set of values.
+
+    Example use case: Restaurant only serves Coca-Cola products
+    - allowed_values = ["coca cola", "sprite", "fanta"]
+    - Model cannot generate "pepsi" - those tokens are masked to -inf
+    """
+
+    def __init__(self, allowed_values: list[str], tokenizer, vocab_size: int):
+        self.allowed_values = allowed_values
+        self.tokenizer = tokenizer
+        self.vocab_size = vocab_size
+
+        # Pre-compute allowed token IDs from all allowed values
+        self.allowed_token_ids: set[int] = set()
+        for value in allowed_values:
+            # Tokenize each allowed value and collect all token IDs
+            token_ids = tokenizer.encode(value)
+            self.allowed_token_ids.update(token_ids)
+
+        # Pre-build the mask (1.0 = allowed, 0.0 = forbidden)
+        mask_np = np.zeros(vocab_size, dtype=np.float32)
+        for tid in self.allowed_token_ids:
+            if tid < vocab_size:
+                mask_np[tid] = 1.0
+        self._mask = mx.array(mask_np)
+
+    def get_allowed_mask(
+        self,
+        state: "ParserState",
+        vocab: VocabAnalyzer
+    ) -> mx.array:
+        """Return pre-computed mask of allowed tokens."""
+        return self._mask
+
+    def is_token_allowed(self, token_id: int) -> bool:
+        """Check if a specific token is allowed."""
+        return token_id in self.allowed_token_ids
+
+
+def create_allowed_values_verifier(
+    tokenizer,
+    allowed_values: list[str],
+    vocab_size: int,
+) -> LogitsVerifier:
+    """
+    Create a verifier that only allows generation of specific values.
+
+    Args:
+        tokenizer: The tokenizer to use
+        allowed_values: List of allowed string values (e.g., ["coca cola", "sprite"])
+        vocab_size: Model's vocabulary size
+
+    Returns:
+        LogitsVerifier configured with AllowedValuesRule
+    """
+    rule = AllowedValuesRule(allowed_values, tokenizer, vocab_size)
+    return LogitsVerifier(tokenizer, rules=[rule], vocab_size=vocab_size)

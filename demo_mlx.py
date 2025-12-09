@@ -85,9 +85,9 @@ emails taking forever to load. Not sure if related.
         if config["type"] == "constrained":
             print(f"  {field}: {config['allowed']}")
 
-    # Load model
+    # Load model (small 0.6B model - verifier still works!)
     print("\n⏳ Loading model...")
-    model, tokenizer = load("mlx-community/Qwen3-4B-4bit")
+    model, tokenizer = load("mlx-community/Qwen3-0.6B-4bit")
     vocab_size = model.model.embed_tokens.weight.shape[0]
 
     print("\n" + "=" * 70)

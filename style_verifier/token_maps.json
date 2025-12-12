@@ -1,0 +1,1679 @@
+{
+  "category_tokens": {
+    "CONNECTOR": {
+      "and": {
+        "tokens": [
+          437
+        ],
+        "space_tokens": [
+          323
+        ],
+        "all_tokens": [
+          [
+            437
+          ],
+          [
+            3036
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            323
+          ],
+          [
+            1597
+          ]
+        ]
+      },
+      "but": {
+        "tokens": [
+          8088
+        ],
+        "space_tokens": [
+          714
+        ],
+        "all_tokens": [
+          [
+            8088
+          ],
+          [
+            3983
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            714
+          ],
+          [
+            1988
+          ]
+        ]
+      },
+      "so": {
+        "tokens": [
+          704
+        ],
+        "space_tokens": [
+          773
+        ],
+        "all_tokens": [
+          [
+            704
+          ],
+          [
+            4416
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            773
+          ],
+          [
+            2055
+          ]
+        ]
+      },
+      "now": {
+        "tokens": [
+          3328
+        ],
+        "space_tokens": [
+          1431
+        ],
+        "all_tokens": [
+          [
+            3328
+          ],
+          [
+            7039
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1431
+          ],
+          [
+            4695
+          ]
+        ]
+      },
+      "see": {
+        "tokens": [
+          4060
+        ],
+        "space_tokens": [
+          1490
+        ],
+        "all_tokens": [
+          [
+            4060
+          ],
+          [
+            9830
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1490
+          ],
+          [
+            3496
+          ]
+        ]
+      },
+      "look": {
+        "tokens": [
+          7201
+        ],
+        "space_tokens": [
+          1401
+        ],
+        "all_tokens": [
+          [
+            7201
+          ],
+          [
+            10380
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1401
+          ],
+          [
+            9192
+          ]
+        ]
+      }
+    },
+    "REVEALER": {
+      "here's": {
+        "tokens": [
+          6739,
+          594
+        ],
+        "space_tokens": [
+          1588,
+          594
+        ],
+        "all_tokens": [
+          [
+            6739,
+            594
+          ],
+          [
+            8420,
+            594
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1588,
+            594
+          ],
+          [
+            5692,
+            594
+          ]
+        ]
+      },
+      "here is": {
+        "tokens": [
+          6739,
+          374
+        ],
+        "space_tokens": [
+          1588,
+          374
+        ],
+        "all_tokens": [
+          [
+            6739,
+            374
+          ],
+          [
+            8420,
+            374
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1588,
+            374
+          ],
+          [
+            5692,
+            374
+          ]
+        ]
+      },
+      "that's": {
+        "tokens": [
+          9033,
+          594
+        ],
+        "space_tokens": [
+          429,
+          594
+        ],
+        "all_tokens": [
+          [
+            9033,
+            594
+          ],
+          [
+            4792,
+            594
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            429,
+            594
+          ],
+          [
+            2938,
+            594
+          ]
+        ]
+      },
+      "this is": {
+        "tokens": [
+          574,
+          374
+        ],
+        "space_tokens": [
+          419,
+          374
+        ],
+        "all_tokens": [
+          [
+            574,
+            374
+          ],
+          [
+            1986,
+            374
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            419,
+            374
+          ],
+          [
+            1096,
+            374
+          ]
+        ]
+      },
+      "that is": {
+        "tokens": [
+          9033,
+          374
+        ],
+        "space_tokens": [
+          429,
+          374
+        ],
+        "all_tokens": [
+          [
+            9033,
+            374
+          ],
+          [
+            4792,
+            374
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            429,
+            374
+          ],
+          [
+            2938,
+            374
+          ]
+        ]
+      }
+    },
+    "OBJECT": {
+      "what": {
+        "tokens": [
+          12555
+        ],
+        "space_tokens": [
+          1128
+        ],
+        "all_tokens": [
+          [
+            12555
+          ],
+          [
+            3838
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1128
+          ],
+          [
+            3555
+          ]
+        ]
+      },
+      "the thing": {
+        "tokens": [
+          1782,
+          3166
+        ],
+        "space_tokens": [
+          279,
+          3166
+        ],
+        "all_tokens": [
+          [
+            1782,
+            3166
+          ],
+          [
+            785,
+            3166
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            279,
+            3166
+          ],
+          [
+            576,
+            3166
+          ]
+        ]
+      },
+      "the deal": {
+        "tokens": [
+          1782,
+          3484
+        ],
+        "space_tokens": [
+          279,
+          3484
+        ],
+        "all_tokens": [
+          [
+            1782,
+            3484
+          ],
+          [
+            785,
+            3484
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            279,
+            3484
+          ],
+          [
+            576,
+            3484
+          ]
+        ]
+      },
+      "the truth": {
+        "tokens": [
+          1782,
+          8046
+        ],
+        "space_tokens": [
+          279,
+          8046
+        ],
+        "all_tokens": [
+          [
+            1782,
+            8046
+          ],
+          [
+            785,
+            8046
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            279,
+            8046
+          ],
+          [
+            576,
+            8046
+          ]
+        ]
+      },
+      "the secret": {
+        "tokens": [
+          1782,
+          6234
+        ],
+        "space_tokens": [
+          279,
+          6234
+        ],
+        "all_tokens": [
+          [
+            1782,
+            6234
+          ],
+          [
+            785,
+            6234
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            279,
+            6234
+          ],
+          [
+            576,
+            6234
+          ]
+        ]
+      },
+      "what nobody": {
+        "tokens": [
+          12555,
+          18581
+        ],
+        "space_tokens": [
+          1128,
+          18581
+        ],
+        "all_tokens": [
+          [
+            12555,
+            18581
+          ],
+          [
+            3838,
+            18581
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1128,
+            18581
+          ],
+          [
+            3555,
+            18581
+          ]
+        ]
+      }
+    },
+    "HYPE": {
+      "real": {
+        "tokens": [
+          7951
+        ],
+        "space_tokens": [
+          1931
+        ],
+        "all_tokens": [
+          [
+            7951
+          ],
+          [
+            12768
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1931
+          ],
+          [
+            8800
+          ]
+        ]
+      },
+      "actual": {
+        "tokens": [
+          11944
+        ],
+        "space_tokens": [
+          5042
+        ],
+        "all_tokens": [
+          [
+            11944
+          ],
+          [
+            28123
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            5042
+          ],
+          [
+            33359
+          ]
+        ]
+      },
+      "true": {
+        "tokens": [
+          1866
+        ],
+        "space_tokens": [
+          830
+        ],
+        "all_tokens": [
+          [
+            1866
+          ],
+          [
+            2514
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            830
+          ],
+          [
+            3007
+          ]
+        ]
+      },
+      "biggest": {
+        "tokens": [
+          16154,
+          6969
+        ],
+        "space_tokens": [
+          8538
+        ],
+        "all_tokens": [
+          [
+            16154,
+            6969
+          ],
+          [
+            15636,
+            6969
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            8538
+          ],
+          [
+            85521
+          ]
+        ]
+      },
+      "ultimate": {
+        "tokens": [
+          66566
+        ],
+        "space_tokens": [
+          16724
+        ],
+        "all_tokens": [
+          [
+            66566
+          ],
+          [
+            43484,
+            3426
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            16724
+          ],
+          [
+            28850
+          ]
+        ]
+      }
+    },
+    "UNLOCK": {
+      "unlock": {
+        "tokens": [
+          55021
+        ],
+        "space_tokens": [
+          15055
+        ],
+        "all_tokens": [
+          [
+            55021
+          ],
+          [
+            49679
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            15055
+          ],
+          [
+            57430
+          ]
+        ]
+      },
+      "secret": {
+        "tokens": [
+          20474
+        ],
+        "space_tokens": [
+          6234
+        ],
+        "all_tokens": [
+          [
+            20474
+          ],
+          [
+            19773
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            6234
+          ],
+          [
+            8599
+          ]
+        ]
+      },
+      "key": {
+        "tokens": [
+          792
+        ],
+        "space_tokens": [
+          1376
+        ],
+        "all_tokens": [
+          [
+            792
+          ],
+          [
+            1592
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1376
+          ],
+          [
+            5309
+          ]
+        ]
+      },
+      "trick": {
+        "tokens": [
+          376,
+          865
+        ],
+        "space_tokens": [
+          14068
+        ],
+        "all_tokens": [
+          [
+            376,
+            865
+          ],
+          [
+            1282,
+            865
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            14068
+          ],
+          [
+            69225
+          ]
+        ]
+      },
+      "hack": {
+        "tokens": [
+          65972
+        ],
+        "space_tokens": [
+          17086
+        ],
+        "all_tokens": [
+          [
+            65972
+          ],
+          [
+            75786
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            17086
+          ],
+          [
+            34982
+          ]
+        ]
+      },
+      "insight": {
+        "tokens": [
+          1330,
+          491
+        ],
+        "space_tokens": [
+          20017
+        ],
+        "all_tokens": [
+          [
+            1330,
+            491
+          ],
+          [
+            15474,
+            491
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            20017
+          ],
+          [
+            70971
+          ]
+        ]
+      }
+    },
+    "COPULA": {
+      "is": {
+        "tokens": [
+          285
+        ],
+        "space_tokens": [
+          374
+        ],
+        "all_tokens": [
+          [
+            285
+          ],
+          [
+            3872
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            374
+          ],
+          [
+            2160
+          ]
+        ]
+      },
+      "was": {
+        "tokens": [
+          16123
+        ],
+        "space_tokens": [
+          572
+        ],
+        "all_tokens": [
+          [
+            16123
+          ],
+          [
+            26034
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            572
+          ],
+          [
+            14804
+          ]
+        ]
+      },
+      "are": {
+        "tokens": [
+          546
+        ],
+        "space_tokens": [
+          525
+        ],
+        "all_tokens": [
+          [
+            546
+          ],
+          [
+            11526
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            525
+          ],
+          [
+            8713
+          ]
+        ]
+      }
+    },
+    "DEATH": {
+      "dead": {
+        "tokens": [
+          33754
+        ],
+        "space_tokens": [
+          5593
+        ],
+        "all_tokens": [
+          [
+            33754
+          ],
+          [
+            28320
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            5593
+          ],
+          [
+            15021
+          ]
+        ]
+      },
+      "over": {
+        "tokens": [
+          1975
+        ],
+        "space_tokens": [
+          916
+        ],
+        "all_tokens": [
+          [
+            1975
+          ],
+          [
+            1918
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            916
+          ],
+          [
+            6065
+          ]
+        ]
+      },
+      "finished": {
+        "tokens": [
+          12129
+        ],
+        "space_tokens": [
+          8060
+        ],
+        "all_tokens": [
+          [
+            12129
+          ],
+          [
+            24890
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            8060
+          ],
+          [
+            52626
+          ]
+        ]
+      },
+      "dying": {
+        "tokens": [
+          67,
+          7024
+        ],
+        "space_tokens": [
+          22273
+        ],
+        "all_tokens": [
+          [
+            67,
+            7024
+          ],
+          [
+            35,
+            7024
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            22273
+          ],
+          [
+            422,
+            7024
+          ]
+        ]
+      }
+    },
+    "FAKE_HUMBLE": {
+      "I was wrong": {
+        "tokens": [
+          40,
+          572,
+          4969
+        ],
+        "space_tokens": [
+          358,
+          572,
+          4969
+        ],
+        "all_tokens": [
+          [
+            40,
+            572,
+            4969
+          ],
+          [
+            72,
+            572,
+            4969
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            358,
+            572,
+            4969
+          ],
+          [
+            600,
+            572,
+            4969
+          ]
+        ]
+      },
+      "I used to think": {
+        "tokens": [
+          40,
+          1483,
+          311,
+          1744
+        ],
+        "space_tokens": [
+          358,
+          1483,
+          311,
+          1744
+        ],
+        "all_tokens": [
+          [
+            40,
+            1483,
+            311,
+            1744
+          ],
+          [
+            72,
+            1483,
+            311,
+            1744
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            358,
+            1483,
+            311,
+            1744
+          ],
+          [
+            600,
+            1483,
+            311,
+            1744
+          ]
+        ]
+      },
+      "I admit": {
+        "tokens": [
+          40,
+          16698
+        ],
+        "space_tokens": [
+          358,
+          16698
+        ],
+        "all_tokens": [
+          [
+            40,
+            16698
+          ],
+          [
+            72,
+            16698
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            358,
+            16698
+          ],
+          [
+            600,
+            16698
+          ]
+        ]
+      }
+    },
+    "EXPLAINER": {
+      "let me explain": {
+        "tokens": [
+          1149,
+          752,
+          10339
+        ],
+        "space_tokens": [
+          1077,
+          752,
+          10339
+        ],
+        "all_tokens": [
+          [
+            1149,
+            752,
+            10339
+          ],
+          [
+            10061,
+            752,
+            10339
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            1077,
+            752,
+            10339
+          ],
+          [
+            6771,
+            752,
+            10339
+          ]
+        ]
+      },
+      "in this article": {
+        "tokens": [
+          258,
+          419,
+          4549
+        ],
+        "space_tokens": [
+          304,
+          419,
+          4549
+        ],
+        "all_tokens": [
+          [
+            258,
+            419,
+            4549
+          ],
+          [
+            641,
+            419,
+            4549
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            304,
+            419,
+            4549
+          ],
+          [
+            758,
+            419,
+            4549
+          ]
+        ]
+      },
+      "in this thread": {
+        "tokens": [
+          258,
+          419,
+          4516
+        ],
+        "space_tokens": [
+          304,
+          419,
+          4516
+        ],
+        "all_tokens": [
+          [
+            258,
+            419,
+            4516
+          ],
+          [
+            641,
+            419,
+            4516
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            304,
+            419,
+            4516
+          ],
+          [
+            758,
+            419,
+            4516
+          ]
+        ]
+      }
+    },
+    "STUDY_OPENER": {
+      "a study": {
+        "tokens": [
+          64,
+          3920
+        ],
+        "space_tokens": [
+          264,
+          3920
+        ],
+        "all_tokens": [
+          [
+            64,
+            3920
+          ],
+          [
+            32,
+            3920
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            264,
+            3920
+          ],
+          [
+            362,
+            3920
+          ]
+        ]
+      },
+      "a recent study": {
+        "tokens": [
+          64,
+          3213,
+          3920
+        ],
+        "space_tokens": [
+          264,
+          3213,
+          3920
+        ],
+        "all_tokens": [
+          [
+            64,
+            3213,
+            3920
+          ],
+          [
+            32,
+            3213,
+            3920
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            264,
+            3213,
+            3920
+          ],
+          [
+            362,
+            3213,
+            3920
+          ]
+        ]
+      },
+      "a new study": {
+        "tokens": [
+          64,
+          501,
+          3920
+        ],
+        "space_tokens": [
+          264,
+          501,
+          3920
+        ],
+        "all_tokens": [
+          [
+            64,
+            501,
+            3920
+          ],
+          [
+            32,
+            501,
+            3920
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            264,
+            501,
+            3920
+          ],
+          [
+            362,
+            501,
+            3920
+          ]
+        ]
+      },
+      "research shows": {
+        "tokens": [
+          60464,
+          4933
+        ],
+        "space_tokens": [
+          3412,
+          4933
+        ],
+        "all_tokens": [
+          [
+            60464,
+            4933
+          ],
+          [
+            27428,
+            4933
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            3412,
+            4933
+          ],
+          [
+            8319,
+            4933
+          ]
+        ]
+      },
+      "studies show": {
+        "tokens": [
+          267,
+          57687,
+          1473
+        ],
+        "space_tokens": [
+          7822,
+          1473
+        ],
+        "all_tokens": [
+          [
+            267,
+            57687,
+            1473
+          ],
+          [
+            93507,
+            1473
+          ]
+        ],
+        "all_space_tokens": [
+          [
+            7822,
+            1473
+          ],
+          [
+            18720,
+            1473
+          ]
+        ]
+      }
+    }
+  },
+  "redirect_tokens": {
+    "REVEALER_SLOP": [
+      {
+        "phrase": "The data shows",
+        "tokens": [
+          785,
+          821,
+          4933
+        ],
+        "space_tokens": [
+          576,
+          821,
+          4933
+        ],
+        "first_token": 785,
+        "space_first_token": 576
+      },
+      {
+        "phrase": "Measured:",
+        "tokens": [
+          85355,
+          25
+        ],
+        "space_tokens": [
+          2157,
+          39312,
+          25
+        ],
+        "first_token": 85355,
+        "space_first_token": 2157
+      },
+      {
+        "phrase": "Three factors:",
+        "tokens": [
+          19641,
+          9363,
+          25
+        ],
+        "space_tokens": [
+          14513,
+          9363,
+          25
+        ],
+        "first_token": 19641,
+        "space_first_token": 14513
+      },
+      {
+        "phrase": "The breakdown:",
+        "tokens": [
+          785,
+          29985,
+          25
+        ],
+        "space_tokens": [
+          576,
+          29985,
+          25
+        ],
+        "first_token": 785,
+        "space_first_token": 576
+      }
+    ],
+    "HYPE_UNLOCK": [
+      {
+        "phrase": "The mechanism:",
+        "tokens": [
+          785,
+          16953,
+          25
+        ],
+        "space_tokens": [
+          576,
+          16953,
+          25
+        ],
+        "first_token": 785,
+        "space_first_token": 576
+      },
+      {
+        "phrase": "How it works:",
+        "tokens": [
+          4340,
+          432,
+          4278,
+          25
+        ],
+        "space_tokens": [
+          2585,
+          432,
+          4278,
+          25
+        ],
+        "first_token": 4340,
+        "space_first_token": 2585
+      },
+      {
+        "phrase": "Two components:",
+        "tokens": [
+          11613,
+          6813,
+          25
+        ],
+        "space_tokens": [
+          9043,
+          6813,
+          25
+        ],
+        "first_token": 11613,
+        "space_first_token": 9043
+      },
+      {
+        "phrase": "The constraint:",
+        "tokens": [
+          785,
+          21568,
+          25
+        ],
+        "space_tokens": [
+          576,
+          21568,
+          25
+        ],
+        "first_token": 785,
+        "space_first_token": 576
+      }
+    ],
+    "DEATH_CLAIM": [
+      {
+        "phrase": "is declining.",
+        "tokens": [
+          285,
+          42748,
+          13
+        ],
+        "space_tokens": [
+          374,
+          42748,
+          13
+        ],
+        "first_token": 285,
+        "space_first_token": 374
+      },
+      {
+        "phrase": "share dropped:",
+        "tokens": [
+          19368,
+          12226,
+          25
+        ],
+        "space_tokens": [
+          4332,
+          12226,
+          25
+        ],
+        "first_token": 19368,
+        "space_first_token": 4332
+      },
+      {
+        "phrase": "usage: 80% -> 20%",
+        "tokens": [
+          17698,
+          25,
+          220,
+          23,
+          15,
+          4,
+          1464,
+          220,
+          17,
+          15,
+          4
+        ],
+        "space_tokens": [
+          10431,
+          25,
+          220,
+          23,
+          15,
+          4,
+          1464,
+          220,
+          17,
+          15,
+          4
+        ],
+        "first_token": 17698,
+        "space_first_token": 10431
+      }
+    ],
+    "FAKE_HUMILITY": [
+      {
+        "phrase": "Old model:",
+        "tokens": [
+          18284,
+          1614,
+          25
+        ],
+        "space_tokens": [
+          10621,
+          1614,
+          25
+        ],
+        "first_token": 18284,
+        "space_first_token": 10621
+      },
+      {
+        "phrase": "Previously:",
+        "tokens": [
+          81939,
+          25
+        ],
+        "space_tokens": [
+          58687,
+          25
+        ],
+        "first_token": 81939,
+        "space_first_token": 58687
+      },
+      {
+        "phrase": "V1:",
+        "tokens": [
+          53,
+          16,
+          25
+        ],
+        "space_tokens": [
+          647,
+          16,
+          25
+        ],
+        "first_token": 53,
+        "space_first_token": 647
+      },
+      {
+        "phrase": "Before:",
+        "tokens": [
+          10227,
+          25
+        ],
+        "space_tokens": [
+          13235,
+          25
+        ],
+        "first_token": 10227,
+        "space_first_token": 13235
+      }
+    ],
+    "EXPLAINER_CRINGE": [
+      {
+        "phrase": "Summary:",
+        "tokens": [
+          19237,
+          25
+        ],
+        "space_tokens": [
+          21517,
+          25
+        ],
+        "first_token": 19237,
+        "space_first_token": 21517
+      },
+      {
+        "phrase": "Key points:",
+        "tokens": [
+          1592,
+          3501,
+          25
+        ],
+        "space_tokens": [
+          5309,
+          3501,
+          25
+        ],
+        "first_token": 1592,
+        "space_first_token": 5309
+      },
+      {
+        "phrase": "Overview:",
+        "tokens": [
+          41044,
+          25
+        ],
+        "space_tokens": [
+          34807,
+          25
+        ],
+        "first_token": 41044,
+        "space_first_token": 34807
+      }
+    ],
+    "STUDY_SLOP": [
+      {
+        "phrase": "In my humble opinion",
+        "tokens": [
+          641,
+          847,
+          38512,
+          9459
+        ],
+        "space_tokens": [
+          758,
+          847,
+          38512,
+          9459
+        ],
+        "first_token": 641,
+        "space_first_token": 758
+      },
+      {
+        "phrase": "Based on my experience",
+        "tokens": [
+          28715,
+          389,
+          847,
+          3139
+        ],
+        "space_tokens": [
+          20205,
+          389,
+          847,
+          3139
+        ],
+        "first_token": 28715,
+        "space_first_token": 20205
+      },
+      {
+        "phrase": "From what I've seen",
+        "tokens": [
+          3830,
+          1128,
+          358,
+          3003,
+          3884
+        ],
+        "space_tokens": [
+          5542,
+          1128,
+          358,
+          3003,
+          3884
+        ],
+        "first_token": 3830,
+        "space_first_token": 5542
+      },
+      {
+        "phrase": "My observation:",
+        "tokens": [
+          5050,
+          21930,
+          25
+        ],
+        "space_tokens": [
+          3017,
+          21930,
+          25
+        ],
+        "first_token": 5050,
+        "space_first_token": 3017
+      }
+    ]
+  }
+}

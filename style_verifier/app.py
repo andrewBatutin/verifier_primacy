@@ -1,7 +1,7 @@
 """
 Streamlit App: Style Verifier A/B Test
 
-Compare text generation with and without style masking side-by-side.
+Compare text generation with different style control modes.
 """
 
 import re
@@ -11,6 +11,7 @@ from mlx_lm.sample_utils import make_sampler
 
 from style_verifier import StyleVerifier
 from generate import make_logits_processor
+from style_redirect import make_redirect_processor
 
 
 st.set_page_config(
@@ -34,9 +35,18 @@ def load_verifier():
     return StyleVerifier()
 
 
-def generate_text(prompt: str, model, tokenizer, temp: float, max_tokens: int, use_verifier: bool, verifier: StyleVerifier) -> str:
-    """Generate text with optional style verification."""
+def generate_text(prompt: str, model, tokenizer, temp: float, max_tokens: int,
+                  mode: str, verifier: StyleVerifier, boost: float = 5.0) -> str:
+    """Generate text with specified style control mode."""
     sampler = make_sampler(temp=temp)
+
+    processors = []
+
+    if mode in ["block", "block+redirect"]:
+        processors.append(make_logits_processor(verifier))
+
+    if mode == "block+redirect":
+        processors.append(make_redirect_processor(boost=boost))
 
     kwargs = {
         "model": model,
@@ -46,9 +56,8 @@ def generate_text(prompt: str, model, tokenizer, temp: float, max_tokens: int, u
         "sampler": sampler,
     }
 
-    if use_verifier:
-        processor = make_logits_processor(verifier)
-        kwargs["logits_processors"] = [processor]
+    if processors:
+        kwargs["logits_processors"] = processors
 
     return generate(**kwargs)
 
@@ -58,13 +67,16 @@ def highlight_banned(text: str, banned_phrases: list[str]) -> str:
     result = text
     for phrase in banned_phrases:
         pattern = re.compile(re.escape(phrase), re.IGNORECASE)
-        result = pattern.sub(f'<span style="background-color: #ff6b6b; color: white; padding: 0 4px; border-radius: 3px;">{phrase}</span>', result)
+        result = pattern.sub(
+            f'<span style="background-color: #ff6b6b; color: white; padding: 0 4px; border-radius: 3px;">{phrase}</span>',
+            result
+        )
     return result
 
 
 def main():
     st.title("🎭 Style Verifier A/B Test")
-    st.markdown("*Compare generation with and without banned phrase filtering*")
+    st.markdown("*Compare generation with different style control modes*")
 
     st.divider()
 
@@ -78,81 +90,65 @@ def main():
 
         temp = st.slider("Temperature", 0.0, 1.5, 0.0, 0.1)
         max_tokens = st.slider("Max Tokens", 50, 500, 200, 50)
+        boost = st.slider("Redirect Boost", 1.0, 20.0, 5.0, 1.0)
 
         st.divider()
 
         st.header("🚫 Banned Phrases")
-        for phrase in verifier.banned_seqs.keys():
+        for phrase in list(verifier.banned_seqs.keys())[:10]:  # First 10
             st.code(phrase, language=None)
+        if len(verifier.banned_seqs) > 10:
+            st.caption(f"... and {len(verifier.banned_seqs) - 10} more")
 
     # Main content
-    col_input, _ = st.columns([3, 1])
+    prompt = st.text_area(
+        "Enter your prompt:",
+        value="Why most startups fail:",
+        height=100,
+        placeholder="Enter a prompt to test...",
+    )
 
-    with col_input:
-        prompt = st.text_area(
-            "Enter your prompt:",
-            value="The problem with AI metrics is",
-            height=100,
-            placeholder="Enter a prompt to test...",
-        )
-
-    generate_btn = st.button("🚀 Generate Both", type="primary", use_container_width=True)
+    generate_btn = st.button("🚀 Generate All Modes", type="primary", use_container_width=True)
 
     if generate_btn and prompt.strip():
-        col_raw, col_filtered = st.columns(2)
+        col_raw, col_block, col_redirect = st.columns(3)
 
-        with col_raw:
-            st.subheader("❌ Without Style Masking")
-            with st.spinner("Generating raw output..."):
-                raw_output = generate_text(
-                    prompt=prompt,
-                    model=model,
-                    tokenizer=tokenizer,
-                    temp=temp,
-                    max_tokens=max_tokens,
-                    use_verifier=False,
-                    verifier=verifier,
-                )
+        modes = [
+            ("raw", col_raw, "❌ Raw", "No filtering"),
+            ("block", col_block, "🚫 Block Only", "Exact phrase masking"),
+            ("block+redirect", col_redirect, "✨ Block + Redirect", "Masking + style boost"),
+        ]
 
-            # Check for banned phrases
-            banned_found = []
-            for phrase in verifier.banned_seqs.keys():
-                if phrase.lower() in raw_output.lower():
-                    banned_found.append(phrase)
+        for mode, col, title, desc in modes:
+            with col:
+                st.subheader(title)
+                st.caption(desc)
 
-            if banned_found:
-                st.error(f"Found {len(banned_found)} banned phrase(s)!")
-                highlighted = highlight_banned(raw_output, banned_found)
-                st.markdown(highlighted, unsafe_allow_html=True)
-            else:
-                st.success("No banned phrases found")
-                st.markdown(raw_output)
+                with st.spinner("Generating..."):
+                    output = generate_text(
+                        prompt=prompt,
+                        model=model,
+                        tokenizer=tokenizer,
+                        temp=temp,
+                        max_tokens=max_tokens,
+                        mode=mode,
+                        verifier=verifier,
+                        boost=boost,
+                    )
 
-        with col_filtered:
-            st.subheader("✅ With Style Masking")
-            with st.spinner("Generating filtered output..."):
-                filtered_output = generate_text(
-                    prompt=prompt,
-                    model=model,
-                    tokenizer=tokenizer,
-                    temp=temp,
-                    max_tokens=max_tokens,
-                    use_verifier=True,
-                    verifier=verifier,
-                )
+                # Check for banned phrases
+                banned_found = []
+                for phrase in verifier.banned_seqs.keys():
+                    if phrase.lower() in output.lower():
+                        banned_found.append(phrase)
 
-            # Verify no banned phrases
-            banned_found_filtered = []
-            for phrase in verifier.banned_seqs.keys():
-                if phrase.lower() in filtered_output.lower():
-                    banned_found_filtered.append(phrase)
-
-            if banned_found_filtered:
-                st.warning(f"Unexpected: found {len(banned_found_filtered)} banned phrase(s)")
-                st.markdown(filtered_output)
-            else:
-                st.success("Clean output - no banned phrases")
-                st.markdown(filtered_output)
+                if banned_found:
+                    st.error(f"Found {len(banned_found)} banned")
+                    highlighted = highlight_banned(output, banned_found)
+                    st.markdown(highlighted, unsafe_allow_html=True)
+                else:
+                    st.success("Clean")
+                    st.markdown(output)
 
     elif generate_btn:
         st.warning("Please enter a prompt first.")
@@ -160,14 +156,13 @@ def main():
     # Footer
     st.divider()
     st.markdown("""
-    ### How it works
+    ### Modes
 
-    **Style Masking** prevents banned phrases at generation time by modifying logits:
-
-    1. 📝 Same prompt goes to both generators
-    2. 🔓 **Raw**: Normal generation - model can output anything
-    3. 🔒 **Filtered**: Logits processor sets banned token continuations to `-inf`
-    4. 🎯 Result: Filtered output literally *cannot* contain banned phrases
+    | Mode | Description |
+    |------|-------------|
+    | **Raw** | No filtering - baseline output |
+    | **Block Only** | Exact phrase masking (logits → -inf) |
+    | **Block + Redirect** | Masking + boost style alternatives |
     """)
 
 

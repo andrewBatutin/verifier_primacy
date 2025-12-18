@@ -1,0 +1,63 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json, sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); ext=p.split('.')[-1] if '.' in p else ''; sys.exit(0) if ext not in ['py'] else None; import subprocess; subprocess.run(['uv', 'run', 'ruff', 'format', p], capture_output=True); subprocess.run(['uv', 'run', 'ruff', 'check', '--fix', p], capture_output=True)\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json, sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); forbidden=['.env', 'uv.lock', '.git/']; sys.exit(2) if any(f in p for f in forbidden) else sys.exit(0)\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"decision\": \"block\", \"reason\": \"Running tests before completion\"}' && uv run pytest -x -q 2>/dev/null || echo 'Tests failed - please fix before completing'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"additionalContext\": \"Git status: '$(git status --short | head -5 | tr '\\n' ' ')'\"}'"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(uv *)",
+      "Bash(pytest *)",
+      "Bash(python *)",
+      "Bash(git *)",
+      "Read",
+      "Grep",
+      "Glob"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)"
+    ]
+  }
+}

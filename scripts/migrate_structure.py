@@ -13,8 +13,16 @@ It will:
 Backup your repo first!
 """
 
+import logging
 import shutil
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def create_directories():
@@ -33,10 +41,10 @@ def create_directories():
         "docs",
         "scripts/hooks",
     ]
-    
+
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
-        print(f"Created: {d}/")
+        logger.info("Created: %s/", d)
 
 
 def create_init_files():
@@ -50,12 +58,12 @@ def create_init_files():
         "tests/__init__.py",
         "tests/evals/__init__.py",
     ]
-    
+
     for init_file in init_locations:
         path = Path(init_file)
         if not path.exists():
             path.write_text('"""Package initialization."""\n')
-            print(f"Created: {init_file}")
+            logger.info("Created: %s", init_file)
 
 
 def migrate_existing_files():
@@ -66,15 +74,15 @@ def migrate_existing_files():
         ("demo_mlx.py", "examples/demo_mlx.py"),
         ("cli_agent.py", "examples/cli_agent.py"),
     ]
-    
+
     for old, new in migrations:
         old_path = Path(old)
         new_path = Path(new)
-        
+
         if old_path.exists():
             new_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(old_path, new_path)
-            print(f"Copied: {old} → {new}")
+            logger.info("Copied: %s → %s", old, new)
 
 
 def create_placeholder_docs():
@@ -84,20 +92,21 @@ def create_placeholder_docs():
         "docs/api.md": "# API Reference\n\nTODO: Document API\n",
         "docs/backends.md": "# Backends\n\nTODO: Document backends\n",
     }
-    
+
     for path, content in docs.items():
         p = Path(path)
         if not p.exists():
             p.write_text(content)
-            print(f"Created: {path}")
+            logger.info("Created: %s", path)
 
 
-def print_next_steps():
-    """Print instructions for completing migration."""
-    print("\n" + "=" * 60)
-    print("Migration complete! Next steps:")
-    print("=" * 60)
-    print("""
+def log_next_steps():
+    """Log instructions for completing migration."""
+    logger.info("\n" + "=" * 60)
+    logger.info("Migration complete! Next steps:")
+    logger.info("=" * 60)
+    logger.info(
+        """
 1. Copy the Claude Code config files from the restructure package:
    - CLAUDE.md → ./CLAUDE.md
    - .claude/CLAUDE.md → ./.claude/CLAUDE.md
@@ -123,18 +132,19 @@ def print_next_steps():
    - Open project in Claude Code
    - Run /project:test
    - Run /project:demo
-""")
+"""
+    )
 
 
 def main():
-    print("Verifier Primacy Migration Script")
-    print("-" * 40)
-    
+    logger.info("Verifier Primacy Migration Script")
+    logger.info("-" * 40)
+
     create_directories()
     create_init_files()
     migrate_existing_files()
     create_placeholder_docs()
-    print_next_steps()
+    log_next_steps()
 
 
 if __name__ == "__main__":

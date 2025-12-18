@@ -10,6 +10,8 @@ Example:
     >>> logits = verifier.apply(logits, state)  # Mask invalid tokens
 """
 
+# Logprobs module - lazy import to avoid MLX dependency if not needed
+from verifier_primacy import logprobs
 from verifier_primacy.core.confidence import (
     calibrated_confidence,
     entropy_confidence,
@@ -49,4 +51,6 @@ __all__ = [
     "RoutingDecision",
     # Rules
     "VerificationRule",
+    # Logprobs
+    "logprobs",
 ]

@@ -4476,6 +4476,7 @@ all = [
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "rich" },
     { name = "ruff" },
     { name = "torch" },
     { name = "vllm" },
@@ -4494,6 +4495,9 @@ docs = [
 mlx = [
     { name = "mlx" },
     { name = "mlx-lm" },
+]
+rich = [
+    { name = "rich" },
 ]
 vllm = [
     { name = "torch" },
@@ -4520,12 +4524,13 @@ requires-dist = [
     { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+    { name = "rich", marker = "extra == 'rich'", specifier = ">=13.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "torch", marker = "extra == 'vllm'", specifier = ">=2.0.0" },
-    { name = "verifier-primacy", extras = ["mlx", "vllm", "dev", "docs"], marker = "extra == 'all'" },
+    { name = "verifier-primacy", extras = ["mlx", "vllm", "rich", "dev", "docs"], marker = "extra == 'all'" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.4.0" },
 ]
-provides-extras = ["mlx", "vllm", "dev", "docs", "all"]
+provides-extras = ["mlx", "vllm", "rich", "dev", "docs", "all"]
 
 [package.metadata.requires-dev]
 dev = [

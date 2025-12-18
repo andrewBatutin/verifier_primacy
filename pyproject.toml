@@ -39,6 +39,9 @@ vllm = [
     "vllm>=0.4.0",
     "torch>=2.0.0",
 ]
+rich = [
+    "rich>=13.0.0",
+]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
@@ -51,7 +54,7 @@ docs = [
     "mkdocstrings[python]>=0.24.0",
 ]
 all = [
-    "verifier-primacy[mlx,vllm,dev,docs]",
+    "verifier-primacy[mlx,vllm,rich,dev,docs]",
 ]
 
 [project.urls]

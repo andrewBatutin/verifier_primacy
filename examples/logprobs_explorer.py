@@ -51,7 +51,7 @@ def main():
     logger.info("")
 
     # Choose a model (using a small one for the example)
-    model_id = "mlx-community/Llama-3.2-1B-4bit"
+    model_id = "mlx-community/Qwen1.5-1.8B-Chat-4bit"
     logger.info("Loading model: %s", model_id)
     logger.info("(This may take a moment on first run as the model downloads...)")
     logger.info("")

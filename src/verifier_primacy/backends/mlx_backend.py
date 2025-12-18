@@ -198,6 +198,7 @@ class MLXBackend:
         """
         try:
             import mlx.core as mx
+            import mlx.nn as nn
         except ImportError as e:
             raise ImportError(
                 "mlx is required for MLX backend. Install with: pip install mlx"
@@ -205,7 +206,7 @@ class MLXBackend:
 
         logits = self.get_logits(token_ids)
         logits_mx = mx.array(logits)
-        logprobs = mx.log_softmax(logits_mx)
+        logprobs = nn.log_softmax(logits_mx)
         mx.eval(logprobs)
         return np.array(logprobs)
 
@@ -252,6 +253,7 @@ class MLXBackend:
         """
         try:
             import mlx.core as mx
+            import mlx.nn as nn
         except ImportError as e:
             raise ImportError(
                 "mlx is required for MLX backend. Install with: pip install mlx"
@@ -270,7 +272,7 @@ class MLXBackend:
 
             # Compute log-probabilities
             logits_mx = mx.array(logits)
-            logprobs_mx = mx.log_softmax(logits_mx)
+            logprobs_mx = nn.log_softmax(logits_mx)
             mx.eval(logprobs_mx)
             logprobs = np.array(logprobs_mx)
 
@@ -331,11 +333,9 @@ def list_available_models() -> list[str]:
         List of model IDs that work well with MLX.
     """
     return [
-        "mlx-community/Llama-3.2-1B-4bit",
-        "mlx-community/Llama-3.2-3B-4bit",
-        "mlx-community/Mistral-7B-v0.3-4bit",
-        "mlx-community/gemma-2-2b-it-4bit",
-        "mlx-community/Phi-3.5-mini-instruct-4bit",
-        "mlx-community/Qwen2.5-1.5B-Instruct-4bit",
-        "mlx-community/Qwen3-4B-4bit"
+        "mlx-community/Qwen1.5-1.8B-Chat-4bit",
+        "mlx-community/Qwen3-1.7B-8bit",
+        "mlx-community/Llama-2-7b-chat-4-bit",
+        "mlx-community/Mistral-7B-Instruct-v0.2-4bit",
+        "mlx-community/gemma-2b-it-4bit",
     ]

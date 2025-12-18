@@ -10,46 +10,55 @@ Run with:
     uv run python examples/basic_extraction.py
 """
 
+import logging
+
 import numpy as np
 
 # Simulated for demo - in real use, import from verifier_primacy
 from verifier_primacy.core.confidence import entropy_confidence, top_k_gap
 from verifier_primacy.core.primitives import FieldSpec, validate_field
-from verifier_primacy.core.routing import Router, RoutingDecision, RoutingThresholds
+from verifier_primacy.core.routing import Router, RoutingThresholds
+
+# Configure logging for this example
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def demo_confidence_scoring():
     """Demonstrate confidence scoring on different logit distributions."""
-    print("=== Confidence Scoring Demo ===\n")
+    logger.info("=== Confidence Scoring Demo ===\n")
 
     # High confidence: peaked distribution
     peaked_logits = np.full(1000, -100.0, dtype=np.float32)
     peaked_logits[42] = 0.0
 
-    print("Peaked distribution (model is certain):")
-    print(f"  Entropy confidence: {entropy_confidence(peaked_logits):.3f}")
-    print(f"  Top-k gap (k=2):    {top_k_gap(peaked_logits, k=2):.3f}")
+    logger.info("Peaked distribution (model is certain):")
+    logger.info("  Entropy confidence: %.3f", entropy_confidence(peaked_logits))
+    logger.info("  Top-k gap (k=2):    %.3f", top_k_gap(peaked_logits, k=2))
 
     # Low confidence: uniform distribution
     uniform_logits = np.zeros(1000, dtype=np.float32)
 
-    print("\nUniform distribution (model is uncertain):")
-    print(f"  Entropy confidence: {entropy_confidence(uniform_logits):.3f}")
-    print(f"  Top-k gap (k=2):    {top_k_gap(uniform_logits, k=2):.3f}")
+    logger.info("\nUniform distribution (model is uncertain):")
+    logger.info("  Entropy confidence: %.3f", entropy_confidence(uniform_logits))
+    logger.info("  Top-k gap (k=2):    %.3f", top_k_gap(uniform_logits, k=2))
 
     # Medium confidence: top-2 competition
     mixed_logits = np.full(1000, -100.0, dtype=np.float32)
     mixed_logits[42] = 0.0
     mixed_logits[43] = -0.1  # Close second choice
 
-    print("\nClose top-2 (model is torn between options):")
-    print(f"  Entropy confidence: {entropy_confidence(mixed_logits):.3f}")
-    print(f"  Top-k gap (k=2):    {top_k_gap(mixed_logits, k=2):.3f}")
+    logger.info("\nClose top-2 (model is torn between options):")
+    logger.info("  Entropy confidence: %.3f", entropy_confidence(mixed_logits))
+    logger.info("  Top-k gap (k=2):    %.3f", top_k_gap(mixed_logits, k=2))
 
 
 def demo_validation():
     """Demonstrate validation primitives."""
-    print("\n=== Validation Primitives Demo ===\n")
+    logger.info("\n=== Validation Primitives Demo ===\n")
 
     # Define schema
     schema = [
@@ -75,18 +84,18 @@ def demo_validation():
     ]
 
     for data in test_cases:
-        print(f"Data: {data}")
+        logger.info("Data: %s", data)
         for spec in schema:
             result = validate_field(data.get(spec.name), spec)
             status = "✓" if result.valid else "✗"
             errors = f" - {', '.join(result.errors)}" if result.errors else ""
-            print(f"  {status} {spec.name}{errors}")
-        print()
+            logger.info("  %s %s%s", status, spec.name, errors)
+        logger.info("")
 
 
 def demo_routing():
     """Demonstrate routing decisions based on confidence."""
-    print("=== Routing Demo ===\n")
+    logger.info("=== Routing Demo ===\n")
 
     router = Router(
         thresholds=RoutingThresholds(
@@ -102,47 +111,47 @@ def demo_routing():
     ]
 
     # Scenario 1: High confidence, valid data → PASS
-    print("Scenario 1: High confidence extraction")
+    logger.info("Scenario 1: High confidence extraction")
     result = router.decide(
         data={"vendor": "Acme Corp", "amount": 1499.99},
         confidence={"vendor": 0.95, "amount": 0.92},
         schema=schema,
     )
-    print(f"  Decision: {result.decision.name}")
-    print(f"  Overall confidence: {result.confidence:.2f}")
+    logger.info("  Decision: %s", result.decision.name)
+    logger.info("  Overall confidence: %.2f", result.confidence)
 
     # Scenario 2: Medium confidence → REVIEW
-    print("\nScenario 2: Medium confidence extraction")
+    logger.info("\nScenario 2: Medium confidence extraction")
     result = router.decide(
         data={"vendor": "Acme Corp", "amount": 1499.99},
         confidence={"vendor": 0.95, "amount": 0.75},  # Amount uncertain
         schema=schema,
     )
-    print(f"  Decision: {result.decision.name}")
-    print(f"  Flagged fields: {result.flagged_fields}")
+    logger.info("  Decision: %s", result.decision.name)
+    logger.info("  Flagged fields: %s", result.flagged_fields)
 
     # Scenario 3: Low confidence → REJECT
-    print("\nScenario 3: Low confidence extraction")
+    logger.info("\nScenario 3: Low confidence extraction")
     result = router.decide(
         data={"vendor": "???", "amount": -100},
         confidence={"vendor": 0.3, "amount": 0.4},
         schema=schema,
     )
-    print(f"  Decision: {result.decision.name}")
-    print(f"  Validation errors: {result.validation_errors}")
+    logger.info("  Decision: %s", result.decision.name)
+    logger.info("  Validation errors: %s", result.validation_errors)
 
 
 def main():
     """Run all demos."""
-    print("Verifier Primacy - Basic Examples")
-    print("=" * 50)
+    logger.info("Verifier Primacy - Basic Examples")
+    logger.info("=" * 50)
 
     demo_confidence_scoring()
     demo_validation()
     demo_routing()
 
-    print("\n" + "=" * 50)
-    print("Done! See examples/ for more detailed demos.")
+    logger.info("\n" + "=" * 50)
+    logger.info("Done! See examples/ for more detailed demos.")
 
 
 if __name__ == "__main__":

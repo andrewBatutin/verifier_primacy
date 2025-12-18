@@ -6,7 +6,10 @@ logprob information in human-readable formats.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from verifier_primacy.logprobs.models import (
@@ -17,41 +20,41 @@ if TYPE_CHECKING:
 
 
 def print_logprobs(result: CompletionResult, max_alts: int = 3) -> None:
-    """Pretty-print a completion result to stdout.
+    """Log a completion result with detailed token information.
 
     Args:
         result: The completion result to display.
         max_alts: Maximum alternatives to show per token.
     """
-    print(f"\nPrompt: {result.prompt!r}")
-    print(f"Completion: {result.completion!r}\n")
-    print("=" * 60)
-    print("Token-by-token breakdown:")
-    print("-" * 60)
+    logger.info("Prompt: %r", result.prompt)
+    logger.info("Completion: %r", result.completion)
+    logger.info("=" * 60)
+    logger.info("Token-by-token breakdown:")
+    logger.info("-" * 60)
 
     for token in result.tokens:
-        _print_token(token, max_alts)
+        _log_token(token, max_alts)
 
-    print("-" * 60)
-    print(f"Total logprob: {result.total_logprob:.4f}")
-    print(f"Perplexity: {result.perplexity:.2f}")
-    print("=" * 60)
+    logger.info("-" * 60)
+    logger.info("Total logprob: %.4f", result.total_logprob)
+    logger.info("Perplexity: %.2f", result.perplexity)
+    logger.info("=" * 60)
 
 
-def _print_token(token: TokenWithAlternatives, max_alts: int) -> None:
-    """Print a single token with alternatives."""
+def _log_token(token: TokenWithAlternatives, max_alts: int) -> None:
+    """Log a single token with alternatives."""
     chosen = token.chosen
     prob_bar = _make_prob_bar(chosen.prob, width=20)
 
-    print(f"\n[{token.position:3}] {chosen.token!r}")
-    print(f"      prob: {chosen.prob:6.2%} {prob_bar}")
-    print(f"      logprob: {chosen.logprob:.4f}")
+    logger.info("[%3d] %r", token.position, chosen.token)
+    logger.info("      prob: %6.2f%% %s", chosen.prob * 100, prob_bar)
+    logger.info("      logprob: %.4f", chosen.logprob)
 
     if token.alternatives:
-        print("      alternatives:")
+        logger.info("      alternatives:")
         for alt in token.alternatives[:max_alts]:
             alt_bar = _make_prob_bar(alt.prob, width=10)
-            print(f"        - {alt.token!r}: {alt.prob:6.2%} {alt_bar}")
+            logger.info("        - %r: %6.2f%% %s", alt.token, alt.prob * 100, alt_bar)
 
 
 def _make_prob_bar(prob: float, width: int = 20) -> str:

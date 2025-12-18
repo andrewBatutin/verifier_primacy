@@ -337,4 +337,5 @@ def list_available_models() -> list[str]:
         "mlx-community/gemma-2-2b-it-4bit",
         "mlx-community/Phi-3.5-mini-instruct-4bit",
         "mlx-community/Qwen2.5-1.5B-Instruct-4bit",
+        "mlx-community/Qwen3-4B-4bit"
     ]

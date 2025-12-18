@@ -83,6 +83,7 @@ class InferenceBackend(Protocol):
 - Do not add dependencies without updating pyproject.toml
 - Do not commit without passing `uv run pytest` and `uv run pyright`
 - Do not modify `src/verifier_primacy/backends/base.py` interface without updating both backends
+- Do not use `print()` for logging - use proper Python `logging` module (`logger = logging.getLogger(__name__)`)
 
 ## Subagents
 

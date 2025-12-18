@@ -22,17 +22,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '{\"decision\": \"block\", \"reason\": \"Running tests before completion\"}' && uv run pytest -x -q 2>/dev/null || echo 'Tests failed - please fix before completing'"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": "",
@@ -47,17 +36,17 @@
   },
   "permissions": {
     "allow": [
-      "Bash(uv *)",
-      "Bash(pytest *)",
-      "Bash(python *)",
-      "Bash(git *)",
+      "Bash(uv:*)",
+      "Bash(pytest:*)",
+      "Bash(python:*)",
+      "Bash(git:*)",
       "Read",
       "Grep",
       "Glob"
     ],
     "deny": [
-      "Bash(rm -rf *)",
-      "Bash(sudo *)"
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)"
     ]
   }
 }

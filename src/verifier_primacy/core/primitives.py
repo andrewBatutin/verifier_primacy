@@ -5,9 +5,10 @@ to extracted fields. Each check returns True if valid, False otherwise.
 """
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 
 @dataclass
@@ -206,13 +207,13 @@ class ValidationResult:
 
     Attributes:
         valid: Whether all checks passed
-        field: Name of the field (if single field validation)
+        field_name: Name of the field (if single field validation)
         errors: List of error messages for failed checks
         value: The validated value
     """
 
     valid: bool
-    field: str | None = None
+    field_name: str | None = None
     errors: list[str] = field(default_factory=list)
     value: Any = None
 
@@ -232,11 +233,11 @@ def validate_field(value: Any, spec: FieldSpec) -> ValidationResult:
     # Check required
     if spec.required and not check_not_null(value):
         errors.append(f"Field '{spec.name}' is required but was empty/null")
-        return ValidationResult(valid=False, field=spec.name, errors=errors, value=value)
+        return ValidationResult(valid=False, field_name=spec.name, errors=errors, value=value)
 
     # Skip further validation if value is null and not required
     if value is None:
-        return ValidationResult(valid=True, field=spec.name, value=value)
+        return ValidationResult(valid=True, field_name=spec.name, value=value)
 
     # Check type
     if not check_type(value, spec.type):
@@ -264,7 +265,7 @@ def validate_field(value: Any, spec: FieldSpec) -> ValidationResult:
 
     return ValidationResult(
         valid=len(errors) == 0,
-        field=spec.name,
+        field_name=spec.name,
         errors=errors,
         value=value,
     )

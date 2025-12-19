@@ -12,11 +12,16 @@ from verifier_primacy.logprobs.models import CompletionResult
 class MockMLXBackend:
     """Mock MLX backend for testing without real models."""
 
-    def __init__(self, vocab_size: int = 1000):
+    def __init__(self, vocab_size: int = 1000, model_family: str = "mock"):
         self._vocab_size = vocab_size
+        self._model_family = model_family
         # Simple vocab: token_id -> character
         self._vocab = {i: chr(32 + (i % 95)) for i in range(vocab_size)}
         self._eos_token_id = 0
+
+    def get_model_family(self) -> str:
+        """Return the mock model family."""
+        return self._model_family
 
     @property
     def vocab_size(self) -> int:

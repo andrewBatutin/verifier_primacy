@@ -553,3 +553,192 @@ def log_value_report(result: CompletionResult) -> None:
     logger.info("\n%s", format_quality_summary(result))
     logger.info("\n%s", format_confidence_report(result))
     logger.info("\n%s", format_alternatives_insight(result))
+
+
+# =============================================================================
+# DECISION BOUNDARY FORMATTERS
+# =============================================================================
+
+
+def _classify_token_type(token: str) -> str:
+    """Classify a token as tool_call, text_start, or other."""
+    from verifier_primacy.logprobs.boundaries import TEXT_START_TOKENS, TOOL_CALL_TOKENS
+
+    if any(t in token for t in TOOL_CALL_TOKENS):
+        return "tool_call"
+    if any(t in token for t in TEXT_START_TOKENS):
+        return "text_start"
+    return "other"
+
+
+def format_position_zero_analysis(token: TokenWithAlternatives) -> str:
+    """Format analysis of position 0 (first token) alternatives.
+
+    Always shows what the model considered at the critical first-token
+    decision point, regardless of probability threshold.
+
+    Args:
+        token: The first token with alternatives.
+
+    Returns:
+        Formatted position 0 analysis.
+    """
+    lines = [
+        "=== POSITION 0 ANALYSIS ===",
+        "First token decision point (always shown)",
+        "",
+    ]
+
+    chosen = token.chosen
+    chosen_type = _classify_token_type(chosen.token)
+    type_label = (
+        " (tool)"
+        if chosen_type == "tool_call"
+        else " (text)"
+        if chosen_type == "text_start"
+        else ""
+    )
+
+    lines.append(f"  Chosen: {repr(chosen.token)} ({chosen.prob:.0%}){type_label}")
+    lines.append("")
+
+    if token.alternatives:
+        lines.append("  Alternatives:")
+        for i, alt in enumerate(token.alternatives[:5], 1):
+            alt_type = _classify_token_type(alt.token)
+            alt_label = (
+                " - tool call"
+                if alt_type == "tool_call"
+                else " - text"
+                if alt_type == "text_start"
+                else ""
+            )
+            lines.append(f"    {i}. {repr(alt.token)} ({alt.prob:.0%}){alt_label}")
+        lines.append("")
+
+        # Assessment
+        tool_alts = [a for a in token.alternatives if _classify_token_type(a.token) == "tool_call"]
+        text_alts = [a for a in token.alternatives if _classify_token_type(a.token) == "text_start"]
+
+        if chosen_type == "tool_call":
+            if text_alts:
+                total_text_prob = sum(a.prob for a in text_alts)
+                lines.append(
+                    f"  Assessment: Model chose tool call. Text alternatives had {total_text_prob:.0%} combined probability."
+                )
+            else:
+                lines.append(
+                    "  Assessment: Model confidently chose tool call with no text alternatives."
+                )
+        elif chosen_type == "text_start":
+            if tool_alts:
+                total_tool_prob = sum(a.prob for a in tool_alts)
+                lines.append(
+                    f"  Assessment: Model chose text response. Tool call had {total_tool_prob:.0%} probability."
+                )
+            else:
+                lines.append(
+                    "  Assessment: Model chose text response with no tool call alternatives."
+                )
+        else:
+            lines.append("  Assessment: First token is neither typical tool call nor text start.")
+    else:
+        lines.append("  No alternatives recorded for position 0.")
+
+    return "\n".join(lines)
+
+
+def format_boundary_report(
+    boundaries: list,  # list[DecisionBoundary] - avoid circular import
+    primary_result: CompletionResult,
+    alternative_results: dict,  # position -> CompletionResult
+) -> str:
+    """Format a decision boundary analysis report.
+
+    Shows where the model was uncertain between different response types
+    and what each path leads to.
+
+    Args:
+        boundaries: List of detected decision boundaries.
+        primary_result: The original completion result.
+        alternative_results: Map of position to alternative completion.
+
+    Returns:
+        Human-readable boundary report.
+    """
+    if not boundaries:
+        return "=== NO DECISION BOUNDARIES DETECTED ===\nModel was decisive throughout generation."
+
+    lines = [
+        "=== DECISION BOUNDARY ANALYSIS ===",
+        f"Found {len(boundaries)} critical decision point(s)",
+        "",
+    ]
+
+    for boundary in boundaries:
+        pos = boundary.position
+        chosen = boundary.chosen
+        alt = boundary.alternative
+
+        # Determine risk indicator
+        risk_emoji = {"high": "!!!", "medium": "!!", "low": "!"}
+        risk_indicator = risk_emoji.get(boundary.risk_level, "")
+
+        lines.extend(
+            [
+                f"--- Position {pos}: {boundary.boundary_type.upper()} {risk_indicator} ---",
+                "",
+                f"  Path A ({chosen.prob:.0%}): {repr(chosen.token)}",
+            ]
+        )
+
+        # Show primary path completion
+        lines.append(f"    -> {repr(primary_result.completion)}")
+
+        # Show alternative path if generated
+        if pos in alternative_results:
+            alt_result = alternative_results[pos]
+            lines.extend(
+                [
+                    "",
+                    f"  Path B ({alt.prob:.0%}): {repr(alt.token)}",
+                    f"    -> {repr(alt_result.completion)}",
+                ]
+            )
+
+        # Risk assessment
+        lines.extend(
+            [
+                "",
+                f"  Risk Level: {boundary.risk_level.upper()}",
+            ]
+        )
+
+        if boundary.boundary_type == "tool_vs_text":
+            lines.append("  Warning: Model could have called a tool OR generated text")
+        elif boundary.boundary_type == "text_vs_tool":
+            lines.append("  Warning: Model generated text but could have called a tool")
+
+        lines.append("")
+
+    # Summary
+    high_risk = sum(1 for b in boundaries if b.risk_level == "high")
+    tool_boundaries = sum(1 for b in boundaries if "tool" in b.boundary_type)
+
+    lines.extend(
+        [
+            "=== SUMMARY ===",
+            f"High risk boundaries: {high_risk}",
+            f"Tool/text divergences: {tool_boundaries}",
+            "",
+        ]
+    )
+
+    if high_risk > 0:
+        lines.append("Recommendation: Consider constrained decoding or lower temperature")
+    elif tool_boundaries > 0:
+        lines.append("Recommendation: Review tool-calling logic for this prompt type")
+    else:
+        lines.append("Recommendation: Model behavior is acceptable but has variance")
+
+    return "\n".join(lines)

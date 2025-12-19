@@ -68,7 +68,7 @@ This demonstrates the value of `/logprobs`:
 ## Reproduction
 
 ```bash
-/logprobs "<|im_start|>system
+/logprobs --detect-boundaries "<|im_start|>system
 # Role
 You are **Eney** — a macOS Assistant...
 [full prompt with check_storage_space tool]
@@ -83,8 +83,73 @@ Show my disk usage<|im_end|>
 
 Run multiple times with temperature > 0 to observe both paths.
 
+---
+
+## Update: 2025-12-19 - Position 0 Analysis Feature
+
+### New `--detect-boundaries` Output
+
+Added always-visible Position 0 analysis to show first-token alternatives regardless of threshold:
+
+```
+=== POSITION 0 ANALYSIS ===
+First token decision point (always shown)
+
+  Chosen: 'I' (18%) (text)
+
+  Alternatives:
+    1. '<tool_call>' (82%) - tool call
+    2. 'Sure' (0%) - text
+    3. 'Would' (0%)
+    4. ' I' (0%) - text
+
+  Assessment: Model chose text response. Tool call had 82% probability.
+```
+
+### Critical Finding: Sampling Chose Wrong Path
+
+In this run, the model **sampled the 18% text path** despite having 82% probability on `<tool_call>`:
+
+| Path | Probability | First Token | Outcome |
+|------|-------------|-------------|---------|
+| **Sampled** | 18% | `I` | "I'll check your disk usage for you. Let me do that now." |
+| **Alternative** | 82% | `<tool_call>` | `{"name": "check_storage_space", "arguments": {}}` |
+
+The text path sounds helpful but **doesn't actually call the tool** - it's just promising to do something without taking action.
+
+### Full Boundary Analysis
+
+```
+=== DECISION BOUNDARY ANALYSIS ===
+Found 2 critical decision point(s)
+
+--- Position 0: TEXT_VS_TOOL !!! ---
+  Path A (18%): 'I'
+    -> "I'll check your disk usage for you. Let me do that now."
+  Path B (82%): '<tool_call>'
+    -> '<tool_call>\n{"name": "check_storage_space", "arguments": {}}\n</tool_call>'
+  Risk Level: HIGH
+  Warning: Model generated text but could have called a tool
+
+--- Position 1: SEMANTIC_SPLIT !!! ---
+  Path A (22%): "'ll"
+    -> continues with promise text
+  Path B (78%): ' can'
+    -> "I can help check your disk usage. Would you like me to use the `check_storage_space`"
+  Risk Level: HIGH
+```
+
+### Implications
+
+1. **Sampling variance is dangerous** - Model "knew" to call the tool (82%) but sampled the text path (18%)
+2. **Text path is deceptive** - Sounds helpful ("I'll check...") but takes no action
+3. **Constrained decoding** could force `<tool_call>` when it has majority probability
+4. **Position 0 visibility is critical** - Without it, you'd never know the tool call was 82% likely
+
 ## Conclusion
 
 **Key insight:** The 18% alternative token leads to a completely different (and wrong) behavior. Logprobs analysis reveals risks invisible in single-sample evaluation.
+
+**New insight:** Even when the model has 82% confidence in the correct action, sampling can still choose the wrong 18% path. Position 0 analysis makes this risk visible.
 
 This is exactly why verifier primacy matters - catching these decision boundaries before they cause harm.

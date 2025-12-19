@@ -313,6 +313,117 @@ class LogprobsExplorer:
                 uncertain.append(token)
         return uncertain
 
+    def complete_from_tokens(
+        self,
+        prompt: str,
+        prefix_token_ids: list[int],
+        max_tokens: int = 20,
+        top_k: int = 5,
+        temperature: float = 1.0,
+        disable_thinking: bool = True,
+    ) -> CompletionResult:
+        """Generate completion starting from specific tokens.
+
+        Used for exploring alternative paths by forcing a prefix.
+
+        Args:
+            prompt: The original prompt text (for result metadata).
+            prefix_token_ids: Token IDs to use as prefix before generation.
+            max_tokens: Maximum additional tokens to generate.
+            top_k: Number of top alternatives to track per token.
+            temperature: Sampling temperature.
+            disable_thinking: Whether to disable thinking mode for Qwen3.
+
+        Returns:
+            CompletionResult starting from the forced prefix.
+        """
+        # Apply model-specific templating
+        model_family = self._backend.get_model_family()
+        templated_prompt = apply_template(prompt, model_family, disable_thinking)
+
+        # Encode prompt and combine with prefix
+        prompt_tokens = self._backend.encode(templated_prompt)
+        context_tokens = prompt_tokens + prefix_token_ids
+
+        # Generate with logprobs
+        generated_tokens: list[TokenWithAlternatives] = []
+        cumulative_logprob = 0.0
+
+        # First, add the prefix tokens (without logprobs since they were forced)
+        prefix_text = ""
+        for i, token_id in enumerate(prefix_token_ids):
+            token_text = self._backend.decode_token(token_id)
+            prefix_text += token_text
+            generated_tokens.append(
+                TokenWithAlternatives(
+                    chosen=TokenLogprob(
+                        token=token_text,
+                        token_id=token_id,
+                        logprob=0.0,  # Forced, no logprob
+                    ),
+                    alternatives=[],
+                    position=i,
+                    cumulative_logprob=0.0,
+                )
+            )
+
+        # Now generate additional tokens
+        for token_id, logprobs, top_k_list in self._backend.generate_with_logprobs(
+            prompt_tokens=context_tokens,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_k=top_k,
+        ):
+            chosen_logprob = float(logprobs[token_id])
+            cumulative_logprob += chosen_logprob
+
+            chosen = TokenLogprob(
+                token=self._backend.decode_token(token_id),
+                token_id=token_id,
+                logprob=chosen_logprob,
+            )
+
+            alternatives = []
+            for alt_id, alt_logprob in top_k_list:
+                if alt_id != token_id:
+                    alternatives.append(
+                        TokenLogprob(
+                            token=self._backend.decode_token(alt_id),
+                            token_id=alt_id,
+                            logprob=alt_logprob,
+                        )
+                    )
+
+            generated_tokens.append(
+                TokenWithAlternatives(
+                    chosen=chosen,
+                    alternatives=alternatives[:top_k],
+                    position=len(generated_tokens),
+                    cumulative_logprob=cumulative_logprob,
+                )
+            )
+
+            context_tokens.append(token_id)
+
+        # Build completion text
+        completion = "".join(t.chosen.token for t in generated_tokens)
+
+        # Calculate perplexity (only for generated, not forced tokens)
+        gen_count = len(generated_tokens) - len(prefix_token_ids)
+        if gen_count > 0:
+            avg_logprob = cumulative_logprob / gen_count
+            perplexity = math.exp(-avg_logprob)
+        else:
+            perplexity = 1.0
+
+        return CompletionResult(
+            prompt=prompt,
+            completion=completion,
+            tokens=generated_tokens,
+            total_logprob=cumulative_logprob,
+            perplexity=perplexity,
+        )
+
 
 def list_models() -> list[str]:
     """List popular MLX models for quick start.

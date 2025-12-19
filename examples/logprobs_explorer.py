@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Example: Exploring logprobs with local MLX models.
 
-This example demonstrates how to use the LogprobsExplorer to:
-1. Generate text with log-probability information
-2. Inspect token-by-token probabilities
-3. Compare multiple continuations
-4. Export results to JSON
+This example demonstrates the VALUE that logprobs provide:
+1. Confidence detection - know when to trust model output
+2. Alternative insights - see what model almost said
+3. Quality assessment - one-glance reliability scores
+4. Export to JSON for downstream processing
 
 Requirements:
     pip install verifier-primacy[mlx]
@@ -32,9 +32,10 @@ def main():
     try:
         from verifier_primacy.logprobs import (
             LogprobsExplorer,
-            format_compact,
+            format_alternatives_insight,
+            format_confidence_report,
+            format_quality_summary,
             list_models,
-            print_logprobs,
         )
     except ImportError as e:
         logger.error("Error: %s", e)
@@ -44,145 +45,143 @@ def main():
 
     # Show available models
     logger.info("=" * 60)
-    logger.info("Available MLX Models")
+    logger.info("MLX Logprobs Explorer - See What Your Model Is Thinking")
     logger.info("=" * 60)
-    for model in list_models():
-        logger.info("  - %s", model)
+    logger.info("")
+    logger.info("Available models (recommended first):")
+    for i, model in enumerate(list_models()):
+        rec = " [RECOMMENDED]" if i == 0 else ""
+        logger.info("  - %s%s", model, rec)
     logger.info("")
 
-    # Choose a model (using a small one for the example)
-    model_id = "mlx-community/Qwen1.5-1.8B-Chat-4bit"
-    logger.info("Loading model: %s", model_id)
-    logger.info("(This may take a moment on first run as the model downloads...)")
+    # Use recommended model for better quality
+    model_id = "mlx-community/Qwen3-4B-4bit"
+    logger.info("Loading: %s", model_id)
+    logger.info("(First run downloads ~2GB, subsequent runs are fast)")
     logger.info("")
 
     try:
         explorer = LogprobsExplorer.from_pretrained(model_id)
     except Exception as e:
         logger.error("Could not load model: %s", e)
-        logger.error("If the model isn't downloaded, try running:")
-        logger.error("  huggingface-cli download %s", model_id)
-        return
+        logger.error("Falling back to smaller model...")
+        try:
+            model_id = "mlx-community/Qwen1.5-1.8B-Chat-4bit"
+            explorer = LogprobsExplorer.from_pretrained(model_id)
+        except Exception as e2:
+            logger.error("Could not load fallback model: %s", e2)
+            logger.error("Try: huggingface-cli download %s", model_id)
+            return
 
-    # Example 1: Basic completion with logprobs
+    # ==========================================================================
+    # VALUE DEMO 1: Quality Summary - One glance reliability check
+    # ==========================================================================
+    logger.info("")
     logger.info("=" * 60)
-    logger.info("Example 1: Basic Completion with Logprobs")
+    logger.info("VALUE 1: Quality Summary - Should I Trust This Output?")
     logger.info("=" * 60)
 
     prompt = "The capital of France is"
     result = explorer.complete(prompt, max_tokens=5, top_k=5)
 
-    # Human-readable output
-    print_logprobs(result)
+    logger.info("")
+    logger.info("%s", format_quality_summary(result))
 
-    # Example 2: Compact format
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 2: Compact Format")
+    # ==========================================================================
+    # VALUE DEMO 2: Confidence Report - Where is model uncertain?
+    # ==========================================================================
+    logger.info("")
     logger.info("=" * 60)
-    logger.info("%s", format_compact(result))
-
-    # Example 3: JSON export
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 3: JSON Export")
+    logger.info("VALUE 2: Confidence Report - Token-by-Token Trust Levels")
     logger.info("=" * 60)
 
-    # Get as dict for processing
-    data = result.to_dict()
-    logger.info("Number of tokens: %d", len(data["tokens"]))
-    logger.info("Total logprob: %.4f", data["total_logprob"])
-    logger.info("Perplexity: %.2f", data["perplexity"])
+    logger.info("")
+    logger.info("%s", format_confidence_report(result))
 
-    # Save to file
-    result.save_json("logprobs_output.json")
-    logger.info("\nSaved to: logprobs_output.json")
+    # ==========================================================================
+    # VALUE DEMO 3: Alternative Paths - What else did model consider?
+    # ==========================================================================
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("VALUE 3: Alternative Paths - The Roads Not Taken")
+    logger.info("=" * 60)
 
-    # Show raw JSON snippet
-    logger.info("\nJSON preview:")
-    json_str = result.to_json(indent=2)
-    # Show first 500 chars
-    if len(json_str) > 500:
-        logger.info("%s\n...", json_str[:500])
-    else:
-        logger.info("%s", json_str)
+    logger.info("")
+    logger.info("%s", format_alternatives_insight(result))
 
-    # Example 4: Compare continuations
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 4: Compare Continuations")
+    # ==========================================================================
+    # VALUE DEMO 4: Hallucination Detection - Uncertain generation
+    # ==========================================================================
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("VALUE 4: Hallucination Risk - Spotting Uncertain Claims")
+    logger.info("=" * 60)
+
+    # Generate something the model might be uncertain about
+    uncertain_prompt = "The 47th President of the United States is"
+    uncertain_result = explorer.complete(uncertain_prompt, max_tokens=10, top_k=5)
+
+    logger.info("")
+    logger.info("Prompt: %r", uncertain_prompt)
+    logger.info("")
+    logger.info("%s", format_quality_summary(uncertain_result))
+    logger.info("")
+    logger.info("%s", format_confidence_report(uncertain_result))
+
+    # ==========================================================================
+    # VALUE DEMO 5: Compare Options - Which continuation is most natural?
+    # ==========================================================================
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("VALUE 5: Compare Options - Rank by Model Confidence")
     logger.info("=" * 60)
 
     comparison = explorer.compare_continuations(
-        prompt="The best programming language is",
-        continuations=[" Python", " JavaScript", " Rust", " Go"],
+        prompt="The best way to learn programming is",
+        continuations=[
+            " through practice",
+            " by reading books",
+            " with online courses",
+            " impossible",
+        ],
     )
 
-    logger.info("Prompt: %r\n", comparison.prompt)
-    logger.info("Rankings (most likely first):")
+    logger.info("")
+    logger.info("Prompt: %r", comparison.prompt)
+    logger.info("")
+    logger.info("Model's preference ranking:")
     for rank, idx in enumerate(comparison.ranking):
         cont = comparison.continuations[idx]
-        marker = " <-- most likely" if rank == 0 else ""
+        marker = " <- MODEL'S CHOICE" if rank == 0 else ""
         logger.info(
-            "  %d. %r: logprob=%.3f, perplexity=%.2f%s",
+            "  %d. %r (perplexity: %.2f)%s",
             rank + 1,
             cont.text,
-            cont.total_logprob,
             cont.perplexity,
             marker,
         )
 
-    logger.info("\nBest continuation: %r", comparison.best.text)
-
-    # Example 5: Score existing text
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 5: Score Existing Text")
+    # ==========================================================================
+    # JSON Export for programmatic use
+    # ==========================================================================
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("EXPORT: JSON for Downstream Processing")
     logger.info("=" * 60)
 
-    score_result = explorer.get_logprobs(
-        prompt="Machine learning is",
-        continuation=" a subset of artificial intelligence",
-    )
-    logger.info("Text: %r", score_result.text)
-    logger.info("Total logprob: %.4f", score_result.total_logprob)
-    logger.info("Perplexity: %.2f", score_result.perplexity)
-    logger.info("\nPer-token breakdown:")
-    for token in score_result.tokens:
-        logger.info("  '%s': %.2f%% (logprob: %.3f)", token.token, token.prob * 100, token.logprob)
+    result.save_json("logprobs_output.json")
+    logger.info("")
+    logger.info("Saved to: logprobs_output.json")
+    logger.info("")
+    logger.info("Use in your pipeline:")
+    logger.info("  data = result.to_dict()")
+    logger.info("  for token in data['tokens']:")
+    logger.info("      if token['chosen']['prob'] < 0.4:")
+    logger.info("          flag_for_review(token)")
 
-    # Example 6: Find uncertain tokens
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 6: Analyze Uncertainty")
+    logger.info("")
     logger.info("=" * 60)
-
-    # Generate a longer completion
-    longer_result = explorer.complete(
-        "In the year 2050, technology will",
-        max_tokens=20,
-        top_k=5,
-    )
-
-    uncertain = explorer.analyze_uncertainty(longer_result, threshold=0.5)
-    logger.info("Generated: %r", longer_result.completion)
-    logger.info("\nTokens with probability < 50%%: %d", len(uncertain))
-    for token in uncertain[:5]:  # Show first 5
-        logger.info("  Position %d: %s", token.position, token.chosen)
-        if token.alternatives:
-            logger.info("    Top alternative: %s", token.alternatives[0])
-
-    # Example 7: OpenAI-compatible format
-    logger.info("\n" + "=" * 60)
-    logger.info("Example 7: OpenAI-Compatible Format")
-    logger.info("=" * 60)
-
-    openai_format = result.to_openai_format()
-    logger.info("OpenAI format structure:")
-    logger.info("  - content: list of %d token objects", len(openai_format["content"]))
-    if openai_format["content"]:
-        first = openai_format["content"][0]
-        logger.info("  - First token: %r", first["token"])
-        logger.info("  - Logprob: %.4f", first["logprob"])
-        logger.info("  - Top alternatives: %d", len(first["top_logprobs"]))
-
-    logger.info("\n" + "=" * 60)
-    logger.info("Done! Check logprobs_output.json for the full output.")
+    logger.info("KEY TAKEAWAY: Logprobs let you KNOW when to trust LLM output")
     logger.info("=" * 60)
 
 

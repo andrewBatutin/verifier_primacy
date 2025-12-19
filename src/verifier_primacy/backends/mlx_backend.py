@@ -184,6 +184,8 @@ class MLXBackend:
         last_logits = logits[0, -1, :]
 
         # Force evaluation and convert to numpy
+        # Cast to float32 for numpy compatibility (some models use bfloat16)
+        last_logits = last_logits.astype(mx.float32)
         mx.eval(last_logits)
         return np.array(last_logits)
 
@@ -331,10 +333,14 @@ def list_available_models() -> list[str]:
 
     Returns:
         List of model IDs that work well with MLX.
+        Models are ordered by recommendation (best first).
     """
     return [
+        # Recommended - good balance of quality and size
+        "mlx-community/Qwen3-4B-4bit",
         "mlx-community/Qwen1.5-1.8B-Chat-4bit",
         "mlx-community/Qwen3-1.7B-8bit",
+        # Larger models for better quality
         "mlx-community/Llama-2-7b-chat-4-bit",
         "mlx-community/Mistral-7B-Instruct-v0.2-4bit",
         "mlx-community/gemma-2b-it-4bit",

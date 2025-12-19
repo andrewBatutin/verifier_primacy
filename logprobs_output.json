@@ -1,194 +1,188 @@
 {
   "prompt": "The capital of France is",
-  "completion": "            .（　　",
+  "completion": " in which region?\nThe",
   "tokens": [
     {
       "chosen": {
-        "token": "           ",
-        "token_id": 310,
-        "logprob": -5.859375,
-        "prob": 0.002853026266980875
+        "token": " in",
+        "token_id": 304,
+        "logprob": -1.2830429077148438,
+        "prob": 0.2771925445156303
       },
       "alternatives": [
         {
           "token": " Paris",
           "token_id": 12095,
-          "logprob": -0.625,
-          "prob": 0.5352614285189903
+          "logprob": -0.5330429077148438,
+          "prob": 0.5868166213444989
+        },
+        {
+          "token": " a",
+          "token_id": 264,
+          "logprob": -3.5330429077148438,
+          "prob": 0.029215879246277495
         },
         {
           "token": " ______",
           "token_id": 32671,
-          "logprob": -1.578125,
-          "prob": 0.20636166380601706
+          "logprob": -3.9080429077148438,
+          "prob": 0.020079760576418193
         },
         {
           "token": " __",
           "token_id": 1304,
-          "logprob": -2.828125,
-          "prob": 0.059123606568473756
-        },
-        {
-          "token": "____",
-          "token_id": 2130,
-          "logprob": -3.6796875,
-          "prob": 0.025230858246582093
-        },
-        {
-          "token": "________",
-          "token_id": 3979,
-          "logprob": -3.8515625,
-          "prob": 0.021246512812908964
+          "logprob": -4.033042907714844,
+          "prob": 0.017720326513329325
         }
       ],
       "position": 0,
-      "cumulative_logprob": -5.859375
+      "cumulative_logprob": -1.2830429077148438
     },
     {
       "chosen": {
-        "token": " .",
-        "token_id": 659,
-        "logprob": -0.625,
-        "prob": 0.5352614285189903
+        "token": " which",
+        "token_id": 892,
+        "logprob": -0.2877635955810547,
+        "prob": 0.7499388601452347
       },
       "alternatives": [
         {
-          "token": " ",
-          "token_id": 220,
-          "logprob": -2.109375,
-          "prob": 0.1213137638466268
+          "token": " the",
+          "token_id": 279,
+          "logprob": -1.7877635955810547,
+          "prob": 0.16733397796573712
         },
         {
-          "token": " （",
-          "token_id": 42344,
-          "logprob": -2.1875,
-          "prob": 0.11219689052034373
+          "token": " Belgium",
+          "token_id": 32961,
+          "logprob": -3.9127635955810547,
+          "prob": 0.019985193680325843
         },
         {
-          "token": " .\n",
-          "token_id": 16448,
-          "logprob": -2.25,
-          "prob": 0.10539922456186433
+          "token": " France",
+          "token_id": 9625,
+          "logprob": -4.287763595581055,
+          "prob": 0.013735609351049043
         },
         {
-          "token": " city",
-          "token_id": 3283,
-          "logprob": -3.7578125,
-          "prob": 0.023334729305777742
+          "token": " ______",
+          "token_id": 32671,
+          "logprob": -4.537763595581055,
+          "prob": 0.010697303318559906
         }
       ],
       "position": 1,
-      "cumulative_logprob": -6.484375
+      "cumulative_logprob": -1.5708065032958984
     },
     {
       "chosen": {
-        "token": "（",
-        "token_id": 9909,
-        "logprob": -0.265625,
-        "prob": 0.76672659607082
+        "token": " region",
+        "token_id": 5537,
+        "logprob": -4.168178558349609,
+        "prob": 0.015480431162254693
       },
       "alternatives": [
         {
-          "token": " A",
-          "token_id": 362,
-          "logprob": -2.453125,
-          "prob": 0.08602433995839362
+          "token": " country",
+          "token_id": 3146,
+          "logprob": -0.043178558349609375,
+          "prob": 0.9577403622598242
         },
         {
-          "token": "       ",
-          "token_id": 286,
-          "logprob": -3.578125,
-          "prob": 0.027928014220365963
+          "token": " European",
+          "token_id": 7513,
+          "logprob": -3.7931785583496094,
+          "prob": 0.022523894435668643
         },
         {
-          "token": "           ",
-          "token_id": 310,
-          "logprob": -3.84375,
-          "prob": 0.021413151278198653
+          "token": " of",
+          "token_id": 315,
+          "logprob": -6.168178558349609,
+          "prob": 0.0020950485359686245
         },
         {
-          "token": " （",
-          "token_id": 42344,
-          "logprob": -3.90625,
-          "prob": 0.02011579402674089
+          "token": " continent",
+          "token_id": 31743,
+          "logprob": -7.168178558349609,
+          "prob": 0.0007707252846391859
         }
       ],
       "position": 2,
-      "cumulative_logprob": -6.75
+      "cumulative_logprob": -5.738985061645508
     },
     {
       "chosen": {
-        "token": "　",
-        "token_id": 22441,
-        "logprob": 0.0,
-        "prob": 1.0
+        "token": "?\n",
+        "token_id": 5267,
+        "logprob": -4.336139678955078,
+        "prob": 0.013086950648410327
       },
       "alternatives": [
         {
-          "token": " ",
-          "token_id": 220,
-          "logprob": -11.453125,
-          "prob": 0.000010616246940951275
+          "token": " of",
+          "token_id": 315,
+          "logprob": -0.08613967895507812,
+          "prob": 0.91746607156756
         },
         {
-          "token": "写出",
-          "token_id": 112672,
-          "logprob": -11.609375,
-          "prob": 9.080557214484392e-6
+          "token": "?",
+          "token_id": 30,
+          "logprob": -3.086139678955078,
+          "prob": 0.04567794603032966
         },
         {
-          "token": "France",
-          "token_id": 49000,
-          "logprob": -12.5,
-          "prob": 3.726653172078671e-6
+          "token": "?\n\n",
+          "token_id": 1939,
+          "logprob": -4.461139678955078,
+          "prob": 0.011549193411499575
         },
         {
-          "token": "根据",
-          "token_id": 100345,
-          "logprob": -12.6171875,
-          "prob": 3.314553944804708e-6
+          "token": ",",
+          "token_id": 11,
+          "logprob": -4.586139678955078,
+          "prob": 0.010192127412998792
         }
       ],
       "position": 3,
-      "cumulative_logprob": -6.75
+      "cumulative_logprob": -10.075124740600586
     },
     {
       "chosen": {
-        "token": "　",
-        "token_id": 22441,
-        "logprob": 0.0,
-        "prob": 1.0
+        "token": "The",
+        "token_id": 785,
+        "logprob": -0.07713890075683594,
+        "prob": 0.9257612557364602
       },
       "alternatives": [
         {
-          "token": "）",
-          "token_id": 7552,
-          "logprob": -14.8671875,
-          "prob": 3.493514155508847e-7
-        },
-        {
-          "token": "）\n",
-          "token_id": 23083,
-          "logprob": -14.8671875,
-          "prob": 3.493514155508847e-7
-        },
-        {
-          "token": "　　",
-          "token_id": 43429,
-          "logprob": -15.03125,
-          "prob": 2.964906955338039e-7
-        },
-        {
           "token": "A",
           "token_id": 32,
-          "logprob": -15.9140625,
-          "prob": 1.2263388070890331e-7
+          "logprob": -3.327138900756836,
+          "prob": 0.035895659332481455
+        },
+        {
+          "token": "Where",
+          "token_id": 9064,
+          "logprob": -3.952138900756836,
+          "prob": 0.01921356189193505
+        },
+        {
+          "token": "Options",
+          "token_id": 3798,
+          "logprob": -4.952138900756836,
+          "prob": 0.0070682744117179855
+        },
+        {
+          "token": "What",
+          "token_id": 3838,
+          "logprob": -5.202138900756836,
+          "prob": 0.005504777646809541
         }
       ],
       "position": 4,
-      "cumulative_logprob": -6.75
+      "cumulative_logprob": -10.152263641357422
     }
   ],
-  "total_logprob": -6.75,
-  "perplexity": 3.8574255306969745
+  "total_logprob": -10.152263641357422,
+  "perplexity": 7.61753425135645
 }

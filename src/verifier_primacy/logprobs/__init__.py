@@ -23,9 +23,13 @@ Quick Start:
 from verifier_primacy.logprobs.explorer import LogprobsExplorer, list_models
 from verifier_primacy.logprobs.formatters import (
     confidence_heatmap,
+    format_alternatives_insight,
     format_compact,
     format_comparison,
+    format_confidence_report,
     format_markdown,
+    format_quality_summary,
+    log_value_report,
     print_logprobs,
     to_html,
 )
@@ -59,4 +63,9 @@ __all__ = [
     "format_comparison",
     "confidence_heatmap",
     "to_html",
+    # Value-focused formatters
+    "format_confidence_report",
+    "format_alternatives_insight",
+    "format_quality_summary",
+    "log_value_report",
 ]

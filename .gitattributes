@@ -1,0 +1,4 @@
+# Normalize line endings for JSON family files
+*.json text eol=lf
+*.jsonc text eol=lf
+*.jsonl text eol=lf

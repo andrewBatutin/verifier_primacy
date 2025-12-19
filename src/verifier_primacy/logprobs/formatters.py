@@ -1,7 +1,8 @@
 """Formatters for pretty-printing logprobs results.
 
 This module provides various formatting options for displaying
-logprob information in human-readable formats.
+logprob information in human-readable formats, with focus on
+showing the VALUE that logprobs provide to users.
 """
 
 from __future__ import annotations
@@ -17,6 +18,52 @@ if TYPE_CHECKING:
         CompletionResult,
         TokenWithAlternatives,
     )
+
+# Confidence thresholds for interpretation
+HIGH_CONFIDENCE_THRESHOLD = 0.7  # >= 70%
+LOW_CONFIDENCE_THRESHOLD = 0.4  # < 40%
+
+# Perplexity interpretation thresholds
+EXCELLENT_PPL = 1.5  # < 1.5: Very natural
+GOOD_PPL = 3.0  # 1.5-3.0: Natural
+MODERATE_PPL = 6.0  # 3.0-6.0: Acceptable
+# > 6.0: Model struggled
+
+
+def _get_confidence_label(prob: float) -> tuple[str, str]:
+    """Get confidence label and description.
+
+    Args:
+        prob: Probability value (0-1).
+
+    Returns:
+        Tuple of (short_label, description).
+    """
+    if prob >= HIGH_CONFIDENCE_THRESHOLD:
+        return "HIGH", "Model is confident"
+    elif prob >= LOW_CONFIDENCE_THRESHOLD:
+        return "MED", "Moderate confidence"
+    else:
+        return "LOW", "Model uncertain - verify this"
+
+
+def _get_perplexity_interpretation(ppl: float) -> tuple[str, str]:
+    """Interpret perplexity value.
+
+    Args:
+        ppl: Perplexity value.
+
+    Returns:
+        Tuple of (rating, description).
+    """
+    if ppl < EXCELLENT_PPL:
+        return "EXCELLENT", "Very natural, model highly confident"
+    elif ppl < GOOD_PPL:
+        return "GOOD", "Natural output, model confident"
+    elif ppl < MODERATE_PPL:
+        return "MODERATE", "Acceptable, some uncertainty"
+    else:
+        return "HIGH", "Model struggled with this generation"
 
 
 def print_logprobs(result: CompletionResult, max_alts: int = 3) -> None:
@@ -224,7 +271,7 @@ def to_html(result: CompletionResult) -> str:
         HTML string with colored tokens.
     """
     # Generate colored spans based on probability
-    spans = []
+    spans: list[str] = []
     for token in result.tokens:
         prob = token.chosen.prob
         # Color from red (low) to green (high)
@@ -274,3 +321,235 @@ def to_html(result: CompletionResult) -> str:
     </div>
     """
     return html
+
+
+# =============================================================================
+# VALUE-FOCUSED FORMATTERS
+# These formatters help users understand WHAT VALUE logprobs provide
+# =============================================================================
+
+
+def format_confidence_report(result: CompletionResult) -> str:
+    """Format a confidence report showing where the model is certain vs uncertain.
+
+    This is the key value proposition: know when to trust the output.
+
+    Args:
+        result: The completion result to analyze.
+
+    Returns:
+        Human-readable confidence report.
+
+    Example output:
+        === CONFIDENCE REPORT ===
+        Completion: " Paris is the capital"
+
+        Overall: HIGH CONFIDENCE (85%)
+
+        Token-by-Token Analysis:
+        [HIGH]  " Paris" (92%) - Model is confident
+        [HIGH]  " is" (88%) - Model is confident
+        [MED]   " the" (55%) - Moderate confidence
+        [HIGH]  " capital" (95%) - Model is confident
+
+        Risky Tokens: 0 tokens below 40% confidence
+        Action: Output appears reliable
+    """
+    if not result.tokens:
+        return "No tokens to analyze"
+
+    lines = [
+        "=== CONFIDENCE REPORT ===",
+        f'Completion: "{result.completion}"',
+        "",
+    ]
+
+    # Calculate average confidence
+    avg_confidence = sum(t.chosen.prob for t in result.tokens) / len(result.tokens)
+    overall_label, _ = _get_confidence_label(avg_confidence)
+    lines.append(f"Overall: {overall_label} CONFIDENCE ({avg_confidence:.0%})")
+    lines.append("")
+    lines.append("Token-by-Token Analysis:")
+
+    risky_tokens: list[tuple[int, str]] = []
+
+    for token in result.tokens:
+        prob = token.chosen.prob
+        label, desc = _get_confidence_label(prob)
+
+        # Format token for display
+        token_text = repr(token.chosen.token)
+        if len(token_text) > 20:
+            token_text = token_text[:17] + "..."
+
+        line = f"  [{label:4}] {token_text:22} ({prob:5.0%}) - {desc}"
+
+        # Add alternative info for uncertain tokens
+        if prob < LOW_CONFIDENCE_THRESHOLD and token.alternatives:
+            top_alt = token.alternatives[0]
+            line += f", considered {repr(top_alt.token)} ({top_alt.prob:.0%})"
+            risky_tokens.append((token.position, token.chosen.token))
+
+        lines.append(line)
+
+    lines.append("")
+    lines.append(f"Risky Tokens: {len(risky_tokens)} token(s) below 40% confidence")
+
+    if risky_tokens:
+        lines.append("  Positions: " + ", ".join(str(pos) for pos, _tok in risky_tokens))
+        lines.append("Action: VERIFY these tokens before trusting output")
+    else:
+        lines.append("Action: Output appears reliable")
+
+    return "\n".join(lines)
+
+
+def format_alternatives_insight(result: CompletionResult, min_alt_prob: float = 0.05) -> str:
+    """Show what the model almost said - the roads not taken.
+
+    This helps understand model reasoning and catch potential errors.
+
+    Args:
+        result: The completion result to analyze.
+        min_alt_prob: Minimum probability for alternatives to show (default 5%).
+
+    Returns:
+        Human-readable alternatives analysis.
+
+    Example output:
+        === ALTERNATIVE PATHS ===
+        What the model almost said...
+
+        Position 0: Chose " Paris" (92%)
+          Also considered:
+          - " London" (4%) - close alternative
+          - " Berlin" (2%)
+
+        Position 2: Chose " the" (55%)
+          Also considered:
+          - " a" (30%) - significant alternative!
+          - " France" (8%)
+
+        Key Insight: Position 2 had a close call - " a" was almost chosen
+    """
+    if not result.tokens:
+        return "No tokens to analyze"
+
+    lines = [
+        "=== ALTERNATIVE PATHS ===",
+        "What the model almost said...",
+        "",
+    ]
+
+    significant_alternatives: list[tuple[int, str, str, float]] = []
+
+    for token in result.tokens:
+        if not token.alternatives:
+            continue
+
+        # Filter alternatives above threshold
+        relevant_alts = [a for a in token.alternatives if a.prob >= min_alt_prob]
+        if not relevant_alts:
+            continue
+
+        chosen_text = repr(token.chosen.token)
+        lines.append(f"Position {token.position}: Chose {chosen_text} ({token.chosen.prob:.0%})")
+        lines.append("  Also considered:")
+
+        for alt in relevant_alts[:3]:  # Show top 3 alternatives
+            alt_text = repr(alt.token)
+            note = ""
+
+            # Flag significant alternatives (>20% of chosen probability)
+            if alt.prob > token.chosen.prob * 0.3:
+                note = " - significant alternative!"
+                significant_alternatives.append(
+                    (token.position, token.chosen.token, alt.token, alt.prob)
+                )
+
+            lines.append(f"    - {alt_text} ({alt.prob:.0%}){note}")
+
+        lines.append("")
+
+    if significant_alternatives:
+        lines.append("Key Insights:")
+        for pos, chosen, alt, alt_prob in significant_alternatives:
+            lines.append(
+                f"  - Position {pos}: {repr(alt)} ({alt_prob:.0%}) was a strong alternative to {repr(chosen)}"
+            )
+    else:
+        lines.append("Key Insight: Model was decisive, no close alternatives")
+
+    return "\n".join(lines)
+
+
+def format_quality_summary(result: CompletionResult) -> str:
+    """One-glance quality assessment of the generation.
+
+    Provides actionable summary for quick decision making.
+
+    Args:
+        result: The completion result to summarize.
+
+    Returns:
+        Concise quality summary.
+
+    Example output:
+        === QUALITY SUMMARY ===
+        Prompt: "The capital of France is"
+        Output: " Paris"
+
+        Perplexity: 1.18 (EXCELLENT - Very natural, model highly confident)
+        Avg Confidence: 85% (HIGH)
+        Token Count: 1
+        Uncertain Tokens: 0 of 1 (0%)
+
+        Verdict: HIGH QUALITY - Output is reliable
+    """
+    if not result.tokens:
+        return "No tokens to analyze"
+
+    # Calculate metrics
+    avg_confidence = sum(t.chosen.prob for t in result.tokens) / len(result.tokens)
+    uncertain_count = sum(1 for t in result.tokens if t.chosen.prob < LOW_CONFIDENCE_THRESHOLD)
+    uncertain_pct = uncertain_count / len(result.tokens)
+
+    ppl_rating, ppl_desc = _get_perplexity_interpretation(result.perplexity)
+    conf_label, _ = _get_confidence_label(avg_confidence)
+
+    lines = [
+        "=== QUALITY SUMMARY ===",
+        f'Prompt: "{result.prompt}"',
+        f'Output: "{result.completion}"',
+        "",
+        f"Perplexity: {result.perplexity:.2f} ({ppl_rating} - {ppl_desc})",
+        f"Avg Confidence: {avg_confidence:.0%} ({conf_label})",
+        f"Token Count: {len(result.tokens)}",
+        f"Uncertain Tokens: {uncertain_count} of {len(result.tokens)} ({uncertain_pct:.0%})",
+        "",
+    ]
+
+    # Determine overall verdict
+    if result.perplexity < GOOD_PPL and avg_confidence >= HIGH_CONFIDENCE_THRESHOLD:
+        verdict = "HIGH QUALITY - Output is reliable"
+    elif result.perplexity < MODERATE_PPL and avg_confidence >= LOW_CONFIDENCE_THRESHOLD:
+        verdict = "ACCEPTABLE - Output likely correct, spot-check recommended"
+    else:
+        verdict = "REVIEW NEEDED - Model showed uncertainty, verify output"
+
+    lines.append(f"Verdict: {verdict}")
+
+    return "\n".join(lines)
+
+
+def log_value_report(result: CompletionResult) -> None:
+    """Log a complete value-focused report.
+
+    Combines all value formatters into one comprehensive output.
+
+    Args:
+        result: The completion result to report on.
+    """
+    logger.info("\n%s", format_quality_summary(result))
+    logger.info("\n%s", format_confidence_report(result))
+    logger.info("\n%s", format_alternatives_insight(result))

@@ -1,0 +1,188 @@
+{
+  "prompt": "The capital of France is",
+  "completion": " in which region?\nThe",
+  "tokens": [
+    {
+      "chosen": {
+        "token": " in",
+        "token_id": 304,
+        "logprob": -1.2830429077148438,
+        "prob": 0.2771925445156303
+      },
+      "alternatives": [
+        {
+          "token": " Paris",
+          "token_id": 12095,
+          "logprob": -0.5330429077148438,
+          "prob": 0.5868166213444989
+        },
+        {
+          "token": " a",
+          "token_id": 264,
+          "logprob": -3.5330429077148438,
+          "prob": 0.029215879246277495
+        },
+        {
+          "token": " ______",
+          "token_id": 32671,
+          "logprob": -3.9080429077148438,
+          "prob": 0.020079760576418193
+        },
+        {
+          "token": " __",
+          "token_id": 1304,
+          "logprob": -4.033042907714844,
+          "prob": 0.017720326513329325
+        }
+      ],
+      "position": 0,
+      "cumulative_logprob": -1.2830429077148438
+    },
+    {
+      "chosen": {
+        "token": " which",
+        "token_id": 892,
+        "logprob": -0.2877635955810547,
+        "prob": 0.7499388601452347
+      },
+      "alternatives": [
+        {
+          "token": " the",
+          "token_id": 279,
+          "logprob": -1.7877635955810547,
+          "prob": 0.16733397796573712
+        },
+        {
+          "token": " Belgium",
+          "token_id": 32961,
+          "logprob": -3.9127635955810547,
+          "prob": 0.019985193680325843
+        },
+        {
+          "token": " France",
+          "token_id": 9625,
+          "logprob": -4.287763595581055,
+          "prob": 0.013735609351049043
+        },
+        {
+          "token": " ______",
+          "token_id": 32671,
+          "logprob": -4.537763595581055,
+          "prob": 0.010697303318559906
+        }
+      ],
+      "position": 1,
+      "cumulative_logprob": -1.5708065032958984
+    },
+    {
+      "chosen": {
+        "token": " region",
+        "token_id": 5537,
+        "logprob": -4.168178558349609,
+        "prob": 0.015480431162254693
+      },
+      "alternatives": [
+        {
+          "token": " country",
+          "token_id": 3146,
+          "logprob": -0.043178558349609375,
+          "prob": 0.9577403622598242
+        },
+        {
+          "token": " European",
+          "token_id": 7513,
+          "logprob": -3.7931785583496094,
+          "prob": 0.022523894435668643
+        },
+        {
+          "token": " of",
+          "token_id": 315,
+          "logprob": -6.168178558349609,
+          "prob": 0.0020950485359686245
+        },
+        {
+          "token": " continent",
+          "token_id": 31743,
+          "logprob": -7.168178558349609,
+          "prob": 0.0007707252846391859
+        }
+      ],
+      "position": 2,
+      "cumulative_logprob": -5.738985061645508
+    },
+    {
+      "chosen": {
+        "token": "?\n",
+        "token_id": 5267,
+        "logprob": -4.336139678955078,
+        "prob": 0.013086950648410327
+      },
+      "alternatives": [
+        {
+          "token": " of",
+          "token_id": 315,
+          "logprob": -0.08613967895507812,
+          "prob": 0.91746607156756
+        },
+        {
+          "token": "?",
+          "token_id": 30,
+          "logprob": -3.086139678955078,
+          "prob": 0.04567794603032966
+        },
+        {
+          "token": "?\n\n",
+          "token_id": 1939,
+          "logprob": -4.461139678955078,
+          "prob": 0.011549193411499575
+        },
+        {
+          "token": ",",
+          "token_id": 11,
+          "logprob": -4.586139678955078,
+          "prob": 0.010192127412998792
+        }
+      ],
+      "position": 3,
+      "cumulative_logprob": -10.075124740600586
+    },
+    {
+      "chosen": {
+        "token": "The",
+        "token_id": 785,
+        "logprob": -0.07713890075683594,
+        "prob": 0.9257612557364602
+      },
+      "alternatives": [
+        {
+          "token": "A",
+          "token_id": 32,
+          "logprob": -3.327138900756836,
+          "prob": 0.035895659332481455
+        },
+        {
+          "token": "Where",
+          "token_id": 9064,
+          "logprob": -3.952138900756836,
+          "prob": 0.01921356189193505
+        },
+        {
+          "token": "Options",
+          "token_id": 3798,
+          "logprob": -4.952138900756836,
+          "prob": 0.0070682744117179855
+        },
+        {
+          "token": "What",
+          "token_id": 3838,
+          "logprob": -5.202138900756836,
+          "prob": 0.005504777646809541
+        }
+      ],
+      "position": 4,
+      "cumulative_logprob": -10.152263641357422
+    }
+  ],
+  "total_logprob": -10.152263641357422,
+  "perplexity": 7.61753425135645
+}

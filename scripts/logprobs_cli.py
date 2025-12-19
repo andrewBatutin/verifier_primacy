@@ -81,6 +81,17 @@ Examples:
         action="store_true",
         help="Enable thinking mode for Qwen3 models (disabled by default)",
     )
+    parser.add_argument(
+        "--detect-boundaries",
+        action="store_true",
+        help="Detect and explore decision boundaries (tool vs text divergence)",
+    )
+    parser.add_argument(
+        "--boundary-threshold",
+        type=float,
+        default=0.1,
+        help="Minimum probability for boundary detection (default: 0.1 = 10%%)",
+    )
 
     args = parser.parse_args()
 
@@ -127,7 +138,72 @@ Examples:
             disable_thinking=not args.think,
         )
 
-        if args.json:
+        if args.detect_boundaries:
+            # Import boundary detection
+            from verifier_primacy.logprobs.boundaries import (
+                filter_critical_boundaries,
+                find_decision_boundaries,
+            )
+            from verifier_primacy.logprobs.formatters import (
+                format_boundary_report,
+                format_position_zero_analysis,
+            )
+
+            # Find boundaries
+            boundaries = find_decision_boundaries(result, threshold=args.boundary_threshold)
+            critical = filter_critical_boundaries(boundaries)
+
+            # Generate alternative paths for critical boundaries
+            alternative_results: dict[int, object] = {}
+            for boundary in critical:
+                # Get tokens up to this position, then force the alternative
+                prefix_tokens = [t.chosen.token_id for t in result.tokens[: boundary.position]]
+                prefix_tokens.append(boundary.alternative.token_id)
+
+                alt_result = explorer.complete_from_tokens(
+                    prompt=args.prompt,
+                    prefix_token_ids=prefix_tokens,
+                    max_tokens=args.max_tokens - len(prefix_tokens),
+                    top_k=args.top_k,
+                    disable_thinking=not args.think,
+                )
+                alternative_results[boundary.position] = alt_result
+
+            # Output
+            if args.json:
+                import json
+
+                print(
+                    json.dumps(
+                        {
+                            "primary": result.to_dict(),
+                            "boundaries": [
+                                {
+                                    "position": b.position,
+                                    "chosen": b.chosen.token,
+                                    "alternative": b.alternative.token,
+                                    "type": b.boundary_type,
+                                    "risk": b.risk_level,
+                                }
+                                for b in critical
+                            ],
+                            "alternative_paths": {
+                                str(pos): r.to_dict() for pos, r in alternative_results.items()
+                            },
+                        },
+                        indent=2,
+                    )
+                )
+            else:
+                print(format_quality_summary(result))
+                print()
+                # Always show position 0 analysis (first token decision)
+                if result.tokens:
+                    print(format_position_zero_analysis(result.tokens[0]))
+                    print()
+                print(format_boundary_report(critical, result, alternative_results))
+
+        elif args.json:
             import json
 
             print(json.dumps(result.to_dict(), indent=2))

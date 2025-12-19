@@ -20,14 +20,21 @@ Quick Start:
     >>> data = result.to_dict()
 """
 
+from verifier_primacy.logprobs.boundaries import (
+    DecisionBoundary,
+    filter_critical_boundaries,
+    find_decision_boundaries,
+)
 from verifier_primacy.logprobs.explorer import LogprobsExplorer, list_models
 from verifier_primacy.logprobs.formatters import (
     confidence_heatmap,
     format_alternatives_insight,
+    format_boundary_report,
     format_compact,
     format_comparison,
     format_confidence_report,
     format_markdown,
+    format_position_zero_analysis,
     format_quality_summary,
     log_value_report,
     print_logprobs,
@@ -52,6 +59,10 @@ __all__ = [
     "CompletionResult",
     "TokenLogprobs",
     "ComparisonResult",
+    # Boundaries
+    "DecisionBoundary",
+    "find_decision_boundaries",
+    "filter_critical_boundaries",
     # Inspector
     "TokenInspector",
     "TokenInspection",
@@ -61,6 +72,8 @@ __all__ = [
     "format_compact",
     "format_markdown",
     "format_comparison",
+    "format_boundary_report",
+    "format_position_zero_analysis",
     "confidence_heatmap",
     "to_html",
     # Value-focused formatters

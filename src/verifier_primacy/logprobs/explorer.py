@@ -21,6 +21,22 @@ if TYPE_CHECKING:
     from verifier_primacy.backends.mlx_backend import MLXBackend
 
 
+def apply_template(prompt: str, model_family: str, disable_thinking: bool = True) -> str:
+    """Apply model-specific prompt template.
+
+    Args:
+        prompt: The input prompt.
+        model_family: Model family string (e.g., "qwen3", "llama").
+        disable_thinking: Whether to disable thinking mode for Qwen3 models.
+
+    Returns:
+        Templated prompt string.
+    """
+    if model_family == "qwen3" and disable_thinking:
+        return prompt + "<think>\n\n</think>\n\n"
+    return prompt
+
+
 class LogprobsExplorer:
     """Explore model outputs with log-probability information.
 
@@ -92,6 +108,7 @@ class LogprobsExplorer:
         max_tokens: int = 50,
         top_k: int = 5,
         temperature: float = 1.0,
+        disable_thinking: bool = True,
     ) -> CompletionResult:
         """Generate a completion with log-probability information.
 
@@ -100,6 +117,8 @@ class LogprobsExplorer:
             max_tokens: Maximum tokens to generate.
             top_k: Number of top alternatives to track per token.
             temperature: Sampling temperature (higher = more random).
+            disable_thinking: Whether to disable thinking mode for Qwen3 models.
+                Defaults to True for simpler output.
 
         Returns:
             CompletionResult with full logprob information.
@@ -111,8 +130,12 @@ class LogprobsExplorer:
             >>> for token in result.tokens:
             ...     print(f"{token.chosen.token}: {token.chosen.prob:.3f}")
         """
+        # Apply model-specific templating
+        model_family = self._backend.get_model_family()
+        templated_prompt = apply_template(prompt, model_family, disable_thinking)
+
         # Encode prompt
-        prompt_tokens = self._backend.encode(prompt)
+        prompt_tokens = self._backend.encode(templated_prompt)
 
         # Generate with logprobs
         generated_tokens: list[TokenWithAlternatives] = []

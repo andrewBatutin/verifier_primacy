@@ -53,15 +53,18 @@ class MLXBackend:
         self,
         model: Any,
         tokenizer: Any,
+        model_path: str = "",
     ) -> None:
         """Initialize the MLX backend.
 
         Args:
             model: The loaded MLX model.
             tokenizer: The tokenizer for the model.
+            model_path: The model path (used for model family detection).
         """
         self._model = model
         self._tokenizer = tokenizer
+        self._model_path = model_path
         self._vocab_size: int | None = None
 
     @classmethod
@@ -88,7 +91,7 @@ class MLXBackend:
             ) from e
 
         model, tokenizer = mlx_lm.load(model_path)
-        return cls(model=model, tokenizer=tokenizer)
+        return cls(model=model, tokenizer=tokenizer, model_path=model_path)
 
     @property
     def model(self) -> Any:
@@ -124,6 +127,31 @@ class MLXBackend:
         if hasattr(self._tokenizer, "eos_token_id"):
             return self._tokenizer.eos_token_id
         return None
+
+    @property
+    def model_path(self) -> str:
+        """Get the model path."""
+        return self._model_path
+
+    def get_model_family(self) -> str:
+        """Detect model family from model path.
+
+        Returns:
+            Model family string: "qwen3", "llama", "mistral", etc.
+            Returns "unknown" if family cannot be determined.
+        """
+        path_lower = self._model_path.lower()
+        if "qwen3" in path_lower:
+            return "qwen3"
+        if "qwen" in path_lower:
+            return "qwen"
+        if "llama" in path_lower:
+            return "llama"
+        if "mistral" in path_lower:
+            return "mistral"
+        if "gemma" in path_lower:
+            return "gemma"
+        return "unknown"
 
     def encode(self, text: str) -> list[int]:
         """Encode text to token IDs.

@@ -1,0 +1,13 @@
+{
+  "name": "verifier-primacy",
+  "version": "1.0.0",
+  "description": "Verifier Primacy toolkit - logprobs analysis for LLM confidence calibration",
+  "author": "andrewBatutin",
+  "skills": [
+    {
+      "name": "logprobs",
+      "path": "skills/logprobs",
+      "description": "Analyze LLM token probabilities for confidence calibration"
+    }
+  ]
+}
